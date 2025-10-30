@@ -54,7 +54,7 @@ public class Jump2D : MonoBehaviour
     {
         // Set vertical velocity directly for consistent jumps
         _rb.linearVelocityY = jumpVelocity;
-
+        //_rb.AddForce(Vector2.up* jumpVelocity, ForceMode2D.Impulse);
         OnJump?.Invoke();
     }
 }
