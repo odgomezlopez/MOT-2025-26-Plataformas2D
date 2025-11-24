@@ -31,10 +31,14 @@ public class Jump2D : MonoBehaviour
         _grounded = GetComponentInChildren<IGrounded2D>();
     }
 
-    private void Update()
+    public void Jump()
     {
-        if (Input.GetKeyDown(jumpKey))
-            _lastJumpPressed = Time.time;
+        _lastJumpPressed = Time.time;
+    }
+
+    public void Jump(bool triggered)
+    {
+        if(triggered) _lastJumpPressed = Time.time;
     }
 
     private void FixedUpdate()

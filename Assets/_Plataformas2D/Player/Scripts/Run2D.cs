@@ -20,10 +20,10 @@ public class Run2D : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    public void Move(Vector2 input)
     {
         //Capturo el input
-        inputX = Input.GetAxis("Horizontal");
+        inputX = input.x;
 
         //Gestiono las animaciones
         if (Mathf.Abs(rb.linearVelocityX) < 0.1) animator.Play("IDLE");
