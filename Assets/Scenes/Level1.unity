@@ -289,10 +289,12 @@ GameObject:
   m_Component:
   - component: {fileID: 40739890}
   - component: {fileID: 40739892}
+  - component: {fileID: 40739897}
   - component: {fileID: 40739896}
   - component: {fileID: 40739893}
   - component: {fileID: 40739894}
   - component: {fileID: 40739895}
+  - component: {fileID: 40739898}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -357,7 +359,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07f30d0e5ad1c544fa3f26b74c21c6b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Run
-  runSpeed: 10
 --- !u!114 &40739894
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -383,9 +384,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e1e59bc750f2e94a8678a1c1f373234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Jump2D
-  jumpKey: 32
-  jumpVelocity: 10
-  jumpBuffer: 0.08
   animatorJumpTrigger: Jump
   OnJump:
     m_PersistentCalls:
@@ -416,7 +414,39 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   input: {fileID: 878220581}
   moveActionRef: {fileID: -1680190386980627800, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  runActionRef: {fileID: -7471211009204490832, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   jumpActionRef: {fileID: -2099379676528639254, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+--- !u!114 &40739897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 40739888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34de854e1c669194bad771e88182dd5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatsComponent
+  stats:
+    characterName: Foxy
+    moveSpeed: 8
+    runModifier: 1.5
+    jumpForce: 10
+    airMomentum: 0.8
+    jumpBuffer: 0.08
+--- !u!114 &40739898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 40739888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea7ffb5035ee3fd4893a9677d7e5678b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnimatorController
 --- !u!1 &92482813
 GameObject:
   m_ObjectHideFlags: 0
@@ -940,6 +970,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &269409062
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 269409063}
+  m_Layer: 0
+  m_Name: ===UI===
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &269409063
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 269409062}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.18443, y: -0.08893, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &384208257 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4758196737642248759, guid: 75ba436dc30c7c349ba80418ce089016, type: 3}
@@ -7721,6 +7782,18 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6728854357427700002, guid: f5c6d3b45bdfb4f49a5cd619d5e32b13, type: 3}
+      propertyPath: m_Color.b
+      value: 0.82492304
+      objectReference: {fileID: 0}
+    - target: {fileID: 6728854357427700002, guid: f5c6d3b45bdfb4f49a5cd619d5e32b13, type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6728854357427700002, guid: f5c6d3b45bdfb4f49a5cd619d5e32b13, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6728854357427700002, guid: f5c6d3b45bdfb4f49a5cd619d5e32b13, type: 3}
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
@@ -7730,7 +7803,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7422440595176649084, guid: f5c6d3b45bdfb4f49a5cd619d5e32b13, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7866,3 +7939,4 @@ SceneRoots:
   - {fileID: 1972109973}
   - {fileID: 1652063534}
   - {fileID: 703667553}
+  - {fileID: 269409063}

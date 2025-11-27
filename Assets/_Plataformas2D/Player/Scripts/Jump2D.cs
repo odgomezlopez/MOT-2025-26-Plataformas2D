@@ -1,37 +1,30 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Jump2D : MonoBehaviour
 {
-    [Header("Input")]
-    [SerializeField] private KeyCode jumpKey = KeyCode.Space;
-
-    [Header("Jump")]
-    [Tooltip("Upward velocity set on jump. Keep it consistent across mass/gravity.")]
-    [SerializeField] private float jumpVelocity = 12f;
-
-    [Tooltip("Allows pressing slightly before landing (seconds).")]
-    [SerializeField, Range(0f, 0.2f)] private float jumpBuffer = 0.08f;
-
+    #region Parameters
     [Header("Optional")]
-    [SerializeField] private string animatorJumpTrigger = "Jump";
     public UnityEvent OnJump;
 
 
     //Compponents
+    StatsComponent statsComponent;
     private Rigidbody2D _rb;
     private IGrounded2D _grounded;
 
     private float _lastJumpPressed = -999f;
-
+    #endregion
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
         _grounded = GetComponentInChildren<IGrounded2D>();
+        statsComponent = GetComponent<StatsComponent>();
     }
 
-    public void Jump()
+    public void Jump(InputAction.CallbackContext context = default)
     {
         _lastJumpPressed = Time.time;
     }
@@ -46,8 +39,10 @@ public class Jump2D : MonoBehaviour
         if (_grounded == null) return;
 
         // Jump if: recently pressed AND currently grounded (your IGrounded2D can include coyote)
-        bool pressedRecently = (Time.time - _lastJumpPressed) <= jumpBuffer;
-        if (pressedRecently && _grounded.IsGrounded)
+        bool pressedRecently = (Time.time - _lastJumpPressed) <= statsComponent.stats.jumpBuffer;
+        
+        
+        if (pressedRecently && (_grounded.IsGrounded))
         {
             DoJump();
             _lastJumpPressed = -999f; // consume buffer
@@ -57,7 +52,7 @@ public class Jump2D : MonoBehaviour
     private void DoJump()
     {
         // Set vertical velocity directly for consistent jumps
-        _rb.linearVelocityY = jumpVelocity;
+        _rb.linearVelocityY = statsComponent.stats.jumpForce;
         //_rb.AddForce(Vector2.up* jumpVelocity, ForceMode2D.Impulse);
         OnJump?.Invoke();
     }
