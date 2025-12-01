@@ -384,7 +384,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e1e59bc750f2e94a8678a1c1f373234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Jump2D
-  animatorJumpTrigger: Jump
   OnJump:
     m_PersistentCalls:
       m_Calls:
@@ -432,8 +431,11 @@ MonoBehaviour:
     characterName: Foxy
     moveSpeed: 8
     runModifier: 1.5
+    acceleration: 10
+    deceleration: 40
+    turnBoost: 1.5
     jumpForce: 10
-    airMomentum: 0.8
+    airMomentum: 0.7
     jumpBuffer: 0.08
 --- !u!114 &40739898
 MonoBehaviour:
@@ -7389,7 +7391,7 @@ MonoBehaviour:
       Offset: {x: 0, y: 0}
   CenterOnActivate: 1
   TargetOffset: {x: 0, y: 0, z: 0}
-  Damping: {x: 1, y: 1, z: 1}
+  Damping: {x: 0.4, y: 0.4, z: 0.4}
   Lookahead:
     Enabled: 0
     Time: 0

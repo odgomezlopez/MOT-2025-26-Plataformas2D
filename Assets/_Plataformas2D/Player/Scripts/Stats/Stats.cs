@@ -8,7 +8,13 @@ public class Stats
 
     [Header("Move parameters")]
     public float moveSpeed = 5f;
-    [Range(1f,5f)] public float runModifier = 1.5f;
+    [Range(1f, 5f)] public float runModifier = 1.5f;
+
+    [Header("Aceleration parameters")]
+    public float acceleration = 20f;
+    public float deceleration = 40f;
+    [Range(1f, 5f)] public float turnBoost = 1.5f;
+
 
     [Header("Jump parameters")]
     public float jumpForce = 10f;
