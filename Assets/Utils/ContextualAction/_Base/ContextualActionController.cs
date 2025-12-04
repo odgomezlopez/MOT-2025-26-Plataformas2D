@@ -90,7 +90,7 @@ public class ContextualActionController : MonoBehaviour
 
         // Assign the input action to PressKeyFromAction, so the key icon or text is shown.
         if (pressKey)
-            pressKey.InputAction = contextualAction;
+            pressKey.InputActionRef = contextualAction;
 
         // Disable the action at start and hide the UI.
         if (toogleActionEnableState) contextualAction?.action.Disable();

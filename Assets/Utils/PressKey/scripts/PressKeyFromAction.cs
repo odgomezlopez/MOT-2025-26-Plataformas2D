@@ -67,7 +67,7 @@ public class PressKeyFromAction : MonoBehaviour
     #endregion
 
     //Getters/Setters
-    public InputActionReference InputAction { 
+    public InputActionReference InputActionRef { 
         get => inputAction; 
         set {
             inputAction = value;
@@ -77,13 +77,18 @@ public class PressKeyFromAction : MonoBehaviour
 
     private void Awake()
     {
+        Init();
+
+        // Initialize text with current binding
+        if(inputAction) UpdateDisplay();
+    }
+
+    private void Init()
+    {
         playerInput = FindFirstObjectByType<PlayerInput>();
         textComponent = GetComponent<TextMeshProUGUI>();
 
         activeControlScheme = playerInput.currentControlScheme;
-
-        // Initialize text with current binding
-        if(inputAction) UpdateDisplay();
     }
 
     private void OnEnable()
@@ -126,12 +131,13 @@ public class PressKeyFromAction : MonoBehaviour
     }
 
     private string GetDisplayString() {
+        if (playerInput == null) Init();
         //1. Defino las variables
         string key= "No active binding";
         string controlScheme = playerInput.currentControlScheme.ToLower();
     
         //2. Obtengo el binding
-        InputBinding activeBinding = InputAction.action.bindings
+        InputBinding activeBinding = InputActionRef.action.bindings
              .FirstOrDefault(binding =>
                  binding.groups
                  .Split(";")
