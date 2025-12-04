@@ -1,51 +1,75 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Interactor : MonoBehaviour
 {
+    #region Parameters
+    [Header("Input")]
+    [SerializeField, Tooltip("If not action is attached, the action will be triggered automatically")] private InputActionReference interactActionRef;
+    public InputActionReference InteractActionRef { get => interactActionRef; }
+
+
     [Header("Behaviour")]
-    [SerializeField] private string interactionName = "Activar";
-    public string InteractionName => interactionName;
-
     [SerializeField] private MonoBehaviour switchableBehaviour; // must implement ISwitchable
-    private ISwitchable target => switchableBehaviour as ISwitchable;
+    public IAction Action => switchableBehaviour as IAction;
 
-    //Checks
-    private MultiCheckEvaluator checkEvaluator;
+    //=== CONDITIONS ===
+    private MultiMetEvaluator<ICheck> checkEvaluator;
+    private MultiMetEvaluator<IRequirement> requirementEvaluator;
 
-    public bool Busy => target.IsActive;
-    public event Action<bool> OnBusy;
+    //=== GETTERS & EVENTS ===
+    public bool IsActionEnable => Action.IsEnable;
+    public event Action<bool> OnIsActionEnable;
+    public bool AllChecksMet => checkEvaluator.AllMet;
+    public event Action<bool> OnChecksMet;
 
-    public bool AllMet => checkEvaluator.AllMet;
-    public event Action<bool> OnAllMet;
+    public bool AllRequirementsMet => requirementEvaluator.AllMet;
+    public event Action<bool> OnRequirementsMet;
 
+    #endregion
+
+    #region Unity Life Cycle
     void Awake()
     {
         // Validate target
-        if (switchableBehaviour != null && target == null)
+        if (switchableBehaviour != null && Action == null)
         {
             Debug.LogError($"{name}: switchableBehaviour does not implement ISwitchable.", this);
         }
 
         // Set up evaluator and find all checks in this hierarchy
-        checkEvaluator = new MultiCheckEvaluator();
-        checkEvaluator.InitChecks(gameObject);
+        checkEvaluator = new MultiMetEvaluator<ICheck>();
+        checkEvaluator.Init(gameObject);
+
+        requirementEvaluator = new MultiMetEvaluator<IRequirement>();
+        requirementEvaluator.Init(gameObject,true);
     }
 
     void OnEnable()
     {
-        checkEvaluator?.Subscribe();
+        if (interactActionRef?.action != null)
+            checkEvaluator.OnAllMetChanged += Subscribe;
+        else
+            checkEvaluator.OnAllMetChanged += Execute;
 
-        checkEvaluator.OnAllMetChanged += OnAllChecksStateChanged;
-        target.OnActionEnded += InteractionEnded;
+        checkEvaluator?.Subscribe();
+        requirementEvaluator?.Subscribe();
+
+        Subscribe();
     }
 
     void OnDisable()
     {
-        checkEvaluator?.Unsubscribe();
+        if (interactActionRef?.action != null)
+            interactActionRef.action.performed -= Execute;
+        else
+            checkEvaluator.OnAllMetChanged -= Execute;
 
-        checkEvaluator.OnAllMetChanged -= OnAllChecksStateChanged;
-        target.OnActionEnded -= InteractionEnded;
+        checkEvaluator?.Unsubscribe();
+        requirementEvaluator?.Unsubscribe();
+
+        Unsubscribe();
     }
 
     void OnDestroy()
@@ -56,35 +80,42 @@ public class Interactor : MonoBehaviour
             checkEvaluator = null;
         }
     }
+    #endregion
 
-    void OnAllChecksStateChanged(bool allMet)
+    private void Subscribe(bool value = true)
     {
-        if (allMet) ExecuteInteraction();
+        if (value != true) return;
 
-        OnAllMet?.Invoke(allMet);
+        if (interactActionRef?.action != null)
+            interactActionRef.action.performed += Execute;
     }
 
-    void ExecuteInteraction()
+    private void Unsubscribe(bool value = false)
     {
+        if (value != false) return;
 
-        if (target == null) return;
-        if (target.IsActive) return;
-
-        target.Activate(gameObject);
-
-        OnBusy?.Invoke(false);
-
+        if (interactActionRef?.action != null)
+            interactActionRef.action.performed -= Execute;
     }
 
-    void InteractionEnded()
+    private void Execute(InputAction.CallbackContext context = default) => Execute();
+    private void Execute(bool AllMet) => Execute();
+
+
+    private void Execute()
     {
-        OnBusy?.Invoke(true);
+        if (Action == null) return;
+        if (!Action.IsEnable) return;
+        if (!checkEvaluator.AllMet) return;
+        if (!requirementEvaluator.AllMet) return;
+
+        Action.Activate(gameObject);
     }
 
     #region Editor utilities
     void OnValidate()
     {
-        if (switchableBehaviour != null && switchableBehaviour is not ISwitchable)
+        if (switchableBehaviour != null && switchableBehaviour is not IAction)
         {
             Debug.LogWarning($"{name}: Assigned component doesn't implement ISwitchable, resetting.", this);
             switchableBehaviour = null;

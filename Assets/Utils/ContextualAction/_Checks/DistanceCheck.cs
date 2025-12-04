@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class DistanceCheck : MonoBehaviour, ICheck, ICheckUI
+public class DistanceCheck : MonoBehaviour, ICheck
 {
     [Header("Range")]
     [SerializeField, Min(0f)] float activateDistance = 1.5f;
@@ -10,9 +10,12 @@ public class DistanceCheck : MonoBehaviour, ICheck, ICheckUI
     [Header("References (optional)")]
     [SerializeField] Transform playerTransform;
 
+    [Header("Performance")]
+    [SerializeField] float frameRate = 5;
+
     // ICheck implementation
     public bool IsMet => isMet;
-    public event Action<bool> OnCheckValueChanged;
+    public event Action<bool> OnMetChanged;
 
     bool isMet;
 
@@ -26,7 +29,7 @@ public class DistanceCheck : MonoBehaviour, ICheck, ICheckUI
 
     void Update()
     {
-        UpdateValue(!requiereReenter);
+        if(Time.frameCount % frameRate == 0)UpdateValue(!requiereReenter);
     }
 
     void UpdateValue(bool forceNotify = false)
@@ -36,7 +39,7 @@ public class DistanceCheck : MonoBehaviour, ICheck, ICheckUI
         if (forceNotify || newValue != isMet)
         {
             isMet = newValue;
-            OnCheckValueChanged?.Invoke(isMet);
+            OnMetChanged?.Invoke(isMet);
         }
     }
 

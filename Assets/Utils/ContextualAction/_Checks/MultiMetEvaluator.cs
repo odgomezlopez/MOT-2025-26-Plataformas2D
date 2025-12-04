@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
 
-public sealed class MultiCheckEvaluator : IDisposable
+public class MultiMetEvaluator<T> : IDisposable where T : class, IMet
 {
-    ICheck[] checks = Array.Empty<ICheck>();
+    T[] checks = Array.Empty<T>();
 
     public bool AllMet { get; private set; }
 
@@ -13,25 +13,30 @@ public sealed class MultiCheckEvaluator : IDisposable
     bool initialized;
     bool subscribed;
 
+    bool defaultValueOnEmpy = false;
+
+
     /// <summary>
     /// Looks for all ICheck components in the given GameObject and its children.
     /// Does NOT subscribe automatically.
     /// </summary>
-    public void InitChecks(GameObject root)
+    public void Init(GameObject root, bool def = false)
     {
         // If we were already subscribed, clean up first
         UnsubscribeInternal();
 
+        defaultValueOnEmpy = def;
+
         if (root == null)
         {
-            checks = Array.Empty<ICheck>();
+            checks = Array.Empty<T>();
             initialized = false;
-            AllMet = false;
+            AllMet = defaultValueOnEmpy;
             return;
         }
 
         // Grab all ICheck in this hierarchy (active and inactive)
-        checks = root.GetComponentsInChildren<ICheck>();//includeInactive: true
+        checks = root.GetComponentsInChildren<T>();//includeInactive: true
         initialized = false;
         AllMet = false;
     }
@@ -43,12 +48,12 @@ public sealed class MultiCheckEvaluator : IDisposable
     {
         if (subscribed) return;
 
-        if (checks == null) checks = Array.Empty<ICheck>();
+        if (checks == null) checks = Array.Empty<T>();
 
         foreach (var check in checks)
         {
             if (check == null) continue;
-            check.OnCheckValueChanged += OnCheckValueChanged;
+            check.OnMetChanged += OnCheckValueChanged;
         }
 
         subscribed = true;
@@ -75,7 +80,7 @@ public sealed class MultiCheckEvaluator : IDisposable
         {
             var check = checks[i];
             if (check == null) continue;
-            check.OnCheckValueChanged -= OnCheckValueChanged;
+            check.OnMetChanged -= OnCheckValueChanged;
         }
 
         subscribed = false;
@@ -83,8 +88,9 @@ public sealed class MultiCheckEvaluator : IDisposable
 
     void OnCheckValueChanged(bool newValue)
     {
-        Recalculate();
+        Recalculate(true);
     }
+
 
     void Recalculate(bool forceNotify = false)
     {
@@ -100,7 +106,7 @@ public sealed class MultiCheckEvaluator : IDisposable
 
     bool EvaluateAll()
     {
-        if (checks == null || checks.Length == 0) return false;
+        if (checks == null || checks.Length == 0) return defaultValueOnEmpy;
 
         for (int i = 0; i < checks.Length; i++)
         {

@@ -8,10 +8,7 @@ public class InteractorUI : MonoBehaviour
 {
     [Header("Availability behaviour")]
     [Tooltip("If false, the UI will stay visible even when the Interactor is inactive.")]
-    [SerializeField] private bool hideWhenInteractorInactive = true;
-
-    [Tooltip("If true, input check will be disabled when the Interactor can't be used.")]
-    [SerializeField] private bool disableInputWhenUnavailable = true;
+    [SerializeField] private bool hideWhenRequirementFail = true;
 
     [Header("Visual style")]
     [SerializeField] private Color availableTextColor = Color.white;
@@ -24,8 +21,8 @@ public class InteractorUI : MonoBehaviour
     Canvas canvas;
 
     Interactor interactor;
-    ICheckUI uiCheck;
-    InputActionCheck actionCheck;
+
+    IAction action;
 
     Image textBackground;
     TextMeshProUGUI actionText;
@@ -38,15 +35,14 @@ public class InteractorUI : MonoBehaviour
         ShowHideCanvas(false);
 
         interactor = GetComponentInParent<Interactor>();
-        uiCheck = interactor?.GetComponentInChildren<ICheckUI>();//If there are multiple UI checks, only the first one is considered
-        actionCheck = interactor?.GetComponentInChildren<InputActionCheck>();
+        action = interactor.Action;
 
         textBackground = GetComponentInChildren<Image>();
         actionText = GetComponentInChildren<TextMeshProUGUI>();
         pressKeyFromAction  = GetComponentInChildren<PressKeyFromAction>();
 
         //Si no hay iterator, distace check or action check se desactiva
-        if(interactor == null || uiCheck == null || actionCheck == null) gameObject.SetActive(false);
+        if(interactor == null) gameObject.SetActive(false);
 
         //Inicializamos los datos
         InitData();
@@ -56,27 +52,25 @@ public class InteractorUI : MonoBehaviour
     {
         // Relaciono la acción del check con la que se muestra en UI
         if (interactor != null && actionText != null)
-            actionText.text = interactor.InteractionName;
+            actionText.text = action.ActionName;
 
-        if (pressKeyFromAction != null && actionCheck != null)
-            pressKeyFromAction.InputActionRef = actionCheck.InteractActionRef;
+        if (interactor != null && pressKeyFromAction != null)
+            pressKeyFromAction.InputActionRef = interactor.InteractActionRef;
 
         initialized = true;
     }
 
     private void OnEnable()
     {
-        uiCheck.OnCheckValueChanged += ShowHideCanvas;
-        interactor.OnBusy += ShowHideCanvas;
-        interactor.OnAllMet += ShowHideCanvas;
+        interactor.OnIsActionEnable += ShowHideCanvas;
+        interactor.OnChecksMet += ShowHideCanvas;
 
     }
 
     private void OnDisable()
     {
-        uiCheck.OnCheckValueChanged -= ShowHideCanvas;
-        interactor.OnBusy -= ShowHideCanvas;
-        interactor.OnAllMet -= ShowHideCanvas;
+        interactor.OnIsActionEnable -= ShowHideCanvas;
+        interactor.OnChecksMet -= ShowHideCanvas;
     }
 
     //TODO disable input when Interactor IsActive o AllMet. Si no está activo desactivar canvas. Si AllMet no se cumple cambiar el estilo. Añadir propiedades que hagan falta. También si es necesario añadir eventos a Interactor para detectar estos cambios.
@@ -87,23 +81,17 @@ public class InteractorUI : MonoBehaviour
         if (!initialized) return;
 
         // 1) Visibility:
-        //    - must be "in range" according to ICheckUI
-        //    - and (optionally) the Interactor must be active
-        bool visible = uiCheck.IsMet &&
-                       (!hideWhenInteractorInactive || !interactor.Busy);
+
+        bool visible = interactor.Action.IsEnable && interactor.AllChecksMet  &&
+                       (interactor.AllRequirementsMet || !hideWhenRequirementFail);
 
         canvas.enabled = visible;
+        if (visible == false) return;
 
-        // 2) Input availability:
-        //    Disable input when Interactor is NOT active or when conditions are NOT met.
-        //    (Matches your TODO comment.)
-        bool inputAllowed = visible &&
-                            !interactor.Busy &&
-                            interactor.AllMet;
 
-        // 3) Visual style if AllMet (CanInteract) is not fulfilled => change style
-        Color bgColor = interactor.AllMet ? availableBackgroundColor : unavailableBackgroundColor;
-        Color txtColor = interactor.AllMet ? availableTextColor : unavailableTextColor;
+        // 2) Visual style if AllMet (CanInteract) is not fulfilled => change style
+        Color bgColor = interactor.AllRequirementsMet ? availableBackgroundColor : unavailableBackgroundColor;
+        Color txtColor = interactor.AllRequirementsMet ? availableTextColor : unavailableTextColor;
 
         if (textBackground != null)
             textBackground.color = bgColor;

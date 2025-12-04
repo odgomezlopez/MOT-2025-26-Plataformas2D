@@ -1,12 +1,12 @@
 using System;
 using UnityEngine;
 
-public class Trigger2DCheck : MonoBehaviour, ICheck, ICheckUI
+public class Trigger2DCheck : MonoBehaviour, ICheck
 {
     public bool IsMet => isMet;
     bool isMet;
 
-    public event Action<bool> OnCheckValueChanged;
+    public event Action<bool> OnMetChanged;
 
     [SerializeField] bool autoDisableRenderer = true;
 
@@ -21,7 +21,7 @@ public class Trigger2DCheck : MonoBehaviour, ICheck, ICheckUI
         if (collision.GetComponentInParent<PlayerController>())
         {
             isMet = true;
-            OnCheckValueChanged.Invoke(isMet);
+            OnMetChanged.Invoke(isMet);
         }
     }
 
@@ -30,7 +30,7 @@ public class Trigger2DCheck : MonoBehaviour, ICheck, ICheckUI
         if (collision.GetComponentInParent<PlayerController>())
         {
             isMet = false;
-            OnCheckValueChanged.Invoke(isMet);
+            OnMetChanged.Invoke(isMet);
         }
     }
 }

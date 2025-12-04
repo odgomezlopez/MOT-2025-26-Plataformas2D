@@ -2,11 +2,17 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Door : MonoBehaviour, ISwitchable
+public class Door : MonoBehaviour, IAction
 {
+    [SerializeField] string actionName = "Abrir";
+    public string ActionName => actionName;
+
+
     bool active = false;
 
-    public bool IsActive => active;
+    public bool IsEnable => active;
+
+
 
     public UnityEvent OnOpen;
 

@@ -7,8 +7,13 @@ using UnityEngine.Events;
 using UnityEngine.Splines;
 using UnityEngine.UIElements;
 
-public class MovePlataform : MonoBehaviour, ISwitchable
+public class MovePlataform : MonoBehaviour, IAction
 {
+    [Header("General data")]
+
+    [SerializeField] string actionName = "Viajar";
+    public string ActionName => actionName;
+
     [Header("Plataform Movement Parameters")]
     [SerializeField] float speed=5f;
     [SerializeField] Transform target;
@@ -18,17 +23,18 @@ public class MovePlataform : MonoBehaviour, ISwitchable
     List<Vector3> targets = new List<Vector3>();
     int currentTarget;
 
-    private bool active;
+    private bool enable = true;
+    public bool IsEnable => enable;
 
+    //Eventos
     public event Action OnActionEnded;
-
-    public bool IsActive => active;
 
     private void Start()
     {
         targets.Add(transform.position);
         targets.Add(target.position);
         currentTarget = 1;
+        enable = true;
     }
 
     //Movimiento a la siguiente posición
@@ -41,7 +47,7 @@ public class MovePlataform : MonoBehaviour, ISwitchable
     private IEnumerator MoveToNextPosition(GameObject activator)
     {
         //Activar
-        active = true;
+        enable = false;
 
         Vector3 targetPosition = targets[currentTarget];
         while (Vector3.Distance(transform.position, targetPosition) > 0.1f)
@@ -54,7 +60,7 @@ public class MovePlataform : MonoBehaviour, ISwitchable
         currentTarget = (currentTarget + 1) % targets.Count;
 
         //yield return new WaitForSeconds(waitBetweenMovements);
-        active = false;
-        OnActionEnded.Invoke();
+        enable = true;
+        OnActionEnded?.Invoke();
     }
 }
