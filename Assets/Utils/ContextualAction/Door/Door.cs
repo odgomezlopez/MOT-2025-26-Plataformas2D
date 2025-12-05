@@ -16,14 +16,14 @@ public class Door : MonoBehaviour, IAction
 
     public UnityEvent OnOpen;
 
-    public event Action OnActionEnded;
+    public event Action OnEnableChange;
 
     public void Activate(GameObject activator)
     {
         active = true;
         //Hago desaparecer la puerta. Programa aquí las acciones que quieras, disparar animación, sonido, etc.
         OnOpen.Invoke();
-        OnActionEnded.Invoke();
+        OnEnableChange.Invoke();
 
         gameObject.SetActive(false);//Opcional, desactivar, mover, lo que quieras.
     }

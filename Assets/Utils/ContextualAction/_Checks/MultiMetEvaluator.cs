@@ -15,17 +15,21 @@ public class MultiMetEvaluator<T> : IDisposable where T : class, IMet
 
     bool defaultValueOnEmpy = false;
 
+    public MultiMetEvaluator(GameObject root, bool metValueOnEmpy = false)
+    {
+        Init(root, defaultValueOnEmpy);
+    }
 
     /// <summary>
     /// Looks for all ICheck components in the given GameObject and its children.
     /// Does NOT subscribe automatically.
     /// </summary>
-    public void Init(GameObject root, bool def = false)
+    public void Init(GameObject root, bool metValueOnEmpy = false)
     {
         // If we were already subscribed, clean up first
         UnsubscribeInternal();
 
-        defaultValueOnEmpy = def;
+        this.defaultValueOnEmpy = metValueOnEmpy;
 
         if (root == null)
         {

@@ -7,9 +7,9 @@ public interface IAction
     public string ActionName { get; }
     public bool IsEnable { get; }
 
+    event Action OnEnableChange;
 
     //Actions Methods
     public void Activate(GameObject activator);
 
-    event Action OnActionEnded;
 }

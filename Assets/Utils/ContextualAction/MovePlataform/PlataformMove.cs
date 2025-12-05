@@ -27,7 +27,7 @@ public class MovePlataform : MonoBehaviour, IAction
     public bool IsEnable => enable;
 
     //Eventos
-    public event Action OnActionEnded;
+    public event Action OnEnableChange;
 
     private void Start()
     {
@@ -61,6 +61,6 @@ public class MovePlataform : MonoBehaviour, IAction
 
         //yield return new WaitForSeconds(waitBetweenMovements);
         enable = true;
-        OnActionEnded?.Invoke();
+        OnEnableChange?.Invoke();
     }
 }

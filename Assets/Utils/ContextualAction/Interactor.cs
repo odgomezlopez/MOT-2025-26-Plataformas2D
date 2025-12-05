@@ -9,14 +9,13 @@ public class Interactor : MonoBehaviour
     [SerializeField, Tooltip("If not action is attached, the action will be triggered automatically")] private InputActionReference interactActionRef;
     public InputActionReference InteractActionRef { get => interactActionRef; }
 
-
     [Header("Behaviour")]
     [SerializeField] private MonoBehaviour switchableBehaviour; // must implement ISwitchable
     public IAction Action => switchableBehaviour as IAction;
 
     //=== CONDITIONS ===
-    private MultiMetEvaluator<ICheck> checkEvaluator;
-    private MultiMetEvaluator<IRequirement> requirementEvaluator;
+    private MultiMetEvaluator<ICheck> checkEvaluator; //Check if the Player is near the Interactor
+    private MultiMetEvaluator<IRequirement> requirementEvaluator; //Check if the Player met the conditions to trigger the action.
 
     //=== GETTERS & EVENTS ===
     public bool IsActionEnable => Action.IsEnable;
@@ -39,11 +38,8 @@ public class Interactor : MonoBehaviour
         }
 
         // Set up evaluator and find all checks in this hierarchy
-        checkEvaluator = new MultiMetEvaluator<ICheck>();
-        checkEvaluator.Init(gameObject);
-
-        requirementEvaluator = new MultiMetEvaluator<IRequirement>();
-        requirementEvaluator.Init(gameObject,true);
+        checkEvaluator = new MultiMetEvaluator<ICheck>(gameObject);
+        requirementEvaluator = new MultiMetEvaluator<IRequirement>(gameObject, true);
     }
 
     void OnEnable()
