@@ -126,6 +126,8 @@ public class PressKeyFromAction : MonoBehaviour
 
     private void UpdateDisplay()
     {
+        if (InputActionRef.action == null) return;
+
         string key = GetDisplayString();
         textComponent.SetText(key);
     }
