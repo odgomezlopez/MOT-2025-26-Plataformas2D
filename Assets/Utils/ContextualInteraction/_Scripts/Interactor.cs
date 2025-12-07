@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 
 //TODO. The canvas must be updated in Editor. Posibility to shown always on Editor
 //TODO. Parameter to autotrigger even if InputActionReference is attached.
+//TODO An Always active Interaction not relate to The player. Rename it PlayerInteractor. Other ContinuousInteration
+//TODO Allo an Interactor to have multiples interaction. Put in Action the one with higher priority
 
 [DefaultExecutionOrder(0)] // In Default Time
 public class Interactor : MonoBehaviour
