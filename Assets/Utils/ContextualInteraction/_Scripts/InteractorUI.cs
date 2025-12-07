@@ -11,22 +11,33 @@ public class InteractorUI : MonoBehaviour
     [Tooltip("If false, the UI will stay visible even when the Interactor is inactive.")]
     [SerializeField] private bool hideWhenRequirementFail = false;
 
-    [Header("Visual style")]
+    [Header("Visual style (text)")]
     [SerializeField] private Color availableTextColor = Color.black;
-    [SerializeField] private Color unavailableTextColor = new Color(1f, 1f, 1f, 0.6f);
-
     [SerializeField] private Color availableBackgroundColor = Color.white;
-    [SerializeField] private Color unavailableBackgroundColor = new Color(1f, 0f, 0f, 0.3f);
 
-    //References
+    [SerializeField] private Color unavailableTextColor = new Color(1f, 1f, 1f, 0.6f);
+    [SerializeField] private Color unavailableBackgroundColor = new Color(0f, 0f, 0f, 0.5f);
+
+    [Header("Visual style (key)")]
+    [SerializeField] private Color availableKeyColor = Color.white;
+    [SerializeField] private Color availableKeyBackgroundColor = Color.black;
+
+    [SerializeField] private Color unavailableKeyColor = new Color(1f, 1f, 1f, 0.5f);
+    [SerializeField] private Color unavailableKeyBackgroundColor = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+
+    //====UI References====
     Canvas canvas;
 
     Interactor interactor;
-
     IInteraction action;
 
     Image textBackground;
     TextMeshProUGUI actionText;
+
+    Image keyBackground;
+    TextMeshProUGUI keyText;
+
+    //====Internal====
     PressKeyFromAction pressKeyFromAction;
     bool initialized = false;
 
@@ -43,12 +54,17 @@ public class InteractorUI : MonoBehaviour
         //Si no hay iterator, distace check or action check se desactiva
         if (interactor == null) { gameObject.SetActive(false); return; }
 
+        pressKeyFromAction = GetComponentInChildren<PressKeyFromAction>();
+
         //Get UI elements
         textBackground = GetComponentInChildren<Image>();
         actionText = GetComponentInChildren<TextMeshProUGUI>();
-        pressKeyFromAction  = GetComponentInChildren<PressKeyFromAction>();
 
-
+        if (pressKeyFromAction)
+        {
+            keyBackground = pressKeyFromAction.GetComponentInParent<Image>();
+            keyText = pressKeyFromAction.GetComponent<TextMeshProUGUI>();
+        }
         //Inicializamos los datos
         InitData();
     }
@@ -77,8 +93,8 @@ public class InteractorUI : MonoBehaviour
         if (interactor.IsActionEnable != null)
             interactor.IsActionEnable.OnValueChanged += ShowHideCanvas;
 
-        if (interactor.AllChecksMet != null)
-            interactor.AllChecksMet.OnValueChanged += ShowHideCanvas;
+        if (interactor.IsPlayerInArea != null)
+            interactor.IsPlayerInArea.OnValueChanged += ShowHideCanvas;
 
         if (interactor.AllRequiermentsMet != null)
             interactor.AllRequiermentsMet.OnValueChanged += ShowHideCanvas; // you were missing this
@@ -92,8 +108,8 @@ public class InteractorUI : MonoBehaviour
         if (interactor.IsActionEnable != null)
             interactor.IsActionEnable.OnValueChanged -= ShowHideCanvas;
 
-        if (interactor.AllChecksMet != null)
-            interactor.AllChecksMet.OnValueChanged -= ShowHideCanvas;
+        if (interactor.IsPlayerInArea != null)
+            interactor.IsPlayerInArea.OnValueChanged -= ShowHideCanvas;
 
         if (interactor.AllRequiermentsMet != null)
             interactor.AllRequiermentsMet.OnValueChanged -= ShowHideCanvas;
@@ -107,14 +123,14 @@ public class InteractorUI : MonoBehaviour
 
         // 1) Visibility:
 
-        bool visible = interactor.IsActionEnable.Value && interactor.AllChecksMet.Value  &&
+        bool visible = interactor.IsActionEnable.Value && interactor.IsPlayerInArea.Value  &&
                        (interactor.AllRequiermentsMet.Value || !hideWhenRequirementFail);
 
         canvas.enabled = visible;
         if (visible == false) return;
 
 
-        // 2) Visual style if AllMet (CanInteract) is not fulfilled => change style
+        // 2) Visual style of the text
         Color bgColor = interactor.AllRequiermentsMet.Value ? availableBackgroundColor : unavailableBackgroundColor;
         Color txtColor = interactor.AllRequiermentsMet.Value ? availableTextColor : unavailableTextColor;
 
@@ -123,5 +139,18 @@ public class InteractorUI : MonoBehaviour
 
         if (actionText != null)
             actionText.color = txtColor;
+
+        // 3) Visual style of the key
+        if (pressKeyFromAction)
+        {
+            Color bgColorKey = interactor.AllRequiermentsMet.Value ? availableKeyBackgroundColor : unavailableKeyBackgroundColor;
+            Color txtColorKey = interactor.AllRequiermentsMet.Value ? availableKeyColor : unavailableKeyColor;
+
+            if (keyBackground != null)
+                keyBackground.color = bgColorKey;
+
+            if (keyText != null)
+                keyText.color = txtColorKey;
+        }
     }
 }

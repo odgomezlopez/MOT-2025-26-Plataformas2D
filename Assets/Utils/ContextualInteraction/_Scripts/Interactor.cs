@@ -2,10 +2,6 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 //TODO. The canvas must be updated in Editor. Posibility to shown always on Editor
 //TODO. Parameter to autotrigger even if InputActionReference is attached.
 
@@ -22,13 +18,12 @@ public class Interactor : MonoBehaviour
     public IInteraction Action => switchableBehaviour as IInteraction;
 
     //=== CONDITIONS ===
-    private MultiMetEvaluator<ICheck> checkEvaluator; //Check if the Player is near the Interactor
-    private MultiMetEvaluator<IRequirement> requirementEvaluator; //Check if the Player met the conditions to trigger the action.
+    [SerializeField] private MultiMetEvaluator<ICheck> playerInAreaChecks; //Check if the Player is near the Interactor
 
     //=== GETTERS & EVENTS ===
+    public ObservableValue<bool> IsPlayerInArea => playerInAreaChecks?.AllMet;
     public ObservableValue<bool> IsActionEnable => Action?.IsEnable;
-    public ObservableValue<bool> AllChecksMet => checkEvaluator?.AllMet;
-    public ObservableValue<bool> AllRequiermentsMet => requirementEvaluator?.AllMet;
+    public ObservableValue<bool> AllRequiermentsMet => Action?.AllRequirementMet;
 
 
     #endregion
@@ -43,14 +38,12 @@ public class Interactor : MonoBehaviour
         }
 
         // Set up evaluator and find all checks in this hierarchy
-        checkEvaluator = new MultiMetEvaluator<ICheck>(gameObject);
-        requirementEvaluator = new MultiMetEvaluator<IRequirement>(gameObject, true);
+        playerInAreaChecks = new MultiMetEvaluator<ICheck>(gameObject);
     }
 
     void OnEnable()
     {
-        checkEvaluator?.Subscribe();
-        requirementEvaluator?.Subscribe();
+        playerInAreaChecks?.Subscribe();
 
         if (interactActionRef?.action != null)
         {
@@ -62,7 +55,7 @@ public class Interactor : MonoBehaviour
         else
         {
             // auto-trigger when checks become true
-            AllChecksMet.OnValueChanged += Execute;
+            IsPlayerInArea.OnValueChanged += Execute;
             AllRequiermentsMet.OnValueChanged += Execute;
             IsActionEnable.OnValueChanged += Execute;
 
@@ -78,21 +71,20 @@ public class Interactor : MonoBehaviour
         }
         else
         {
-            AllChecksMet.OnValueChanged -= Execute;
+            IsPlayerInArea.OnValueChanged -= Execute;
             AllRequiermentsMet.OnValueChanged -= Execute;
             IsActionEnable.OnValueChanged -= Execute;
         }
 
-        checkEvaluator?.Unsubscribe();
-        requirementEvaluator?.Unsubscribe();
+        playerInAreaChecks?.Unsubscribe();
     }
 
     void OnDestroy()
     {
-        if (checkEvaluator != null)
+        if (playerInAreaChecks != null)
         {
-            checkEvaluator.Dispose();
-            checkEvaluator = null;
+            playerInAreaChecks.Dispose();
+            playerInAreaChecks = null;
         }
     }
     #endregion
@@ -105,8 +97,8 @@ public class Interactor : MonoBehaviour
     {
         if (Action == null) return;
         if (!IsActionEnable.Value) return;
-        if (!checkEvaluator.AllMet.Value) return;
-        if (!requirementEvaluator.AllMet.Value) return;
+        if (!IsPlayerInArea.Value) return;
+        if (!AllRequiermentsMet.Value) return;
 
         Action.Activate(gameObject);
     }
@@ -122,34 +114,3 @@ public class Interactor : MonoBehaviour
     }
     #endregion
 }
-
-
-
-#if UNITY_EDITOR
-
-[CustomEditor(typeof(Interactor))]
-[CanEditMultipleObjects]
-public class InteractorEditor : Editor
-{
-    public override void OnInspectorGUI()
-    {
-        DrawDefaultInspector();
-
-        var i = (Interactor)target;
-
-        EditorGUILayout.Space(10);
-        EditorGUILayout.LabelField("Debug (runtime)", EditorStyles.boldLabel);
-
-        using (new EditorGUI.DisabledScope(true))
-        {
-            bool actionEnabled = i.IsActionEnable?.Value ?? false;
-            bool checksMet = i.AllChecksMet?.Value ?? false;
-            bool reqsMet = i.AllRequiermentsMet?.Value ?? false;
-
-            EditorGUILayout.Toggle("Is Action Enabled", actionEnabled);
-            EditorGUILayout.Toggle("All Checks Met", checksMet);
-            EditorGUILayout.Toggle("All Requirements Met", reqsMet);
-        }
-    }
-}
-#endif

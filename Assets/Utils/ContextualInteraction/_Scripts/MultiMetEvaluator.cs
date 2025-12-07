@@ -1,6 +1,14 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.UIElements;
+#endif
+
+[System.Serializable]
 public class MultiMetEvaluator<T> : IDisposable where T : class, IMet
 {
     T[] checks = Array.Empty<T>();
@@ -124,3 +132,24 @@ public class MultiMetEvaluator<T> : IDisposable where T : class, IMet
         UnsubscribeInternal();
     }
 }
+
+#if UNITY_EDITOR
+[CustomPropertyDrawer(typeof(MultiMetEvaluator<>), true)]
+public class MultiMetEvaluatorDrawer : PropertyDrawer
+{
+    public override VisualElement CreatePropertyGUI(SerializedProperty property)
+    {
+        // Find AllMet._value
+        var allMetProp = property.FindPropertyRelative("AllMet");
+        var boolProp = allMetProp?.FindPropertyRelative("_value");
+
+        // Build: "<Owner>_<Field>_AllMet"  (field display name is already "Requirements", etc.)
+        string niceFieldName = property.displayName.Replace(" ", "");
+        string label = $"{niceFieldName}_AllMet";
+
+        return boolProp != null
+            ? new PropertyField(boolProp, label)
+            : new Label($"{label}: missing AllMet/_value");
+    }
+}
+#endif

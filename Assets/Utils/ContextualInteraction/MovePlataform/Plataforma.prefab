@@ -191,6 +191,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 145557432820001826, guid: 69459eaa3f31e0d44bea24f661023407, type: 3}
+      propertyPath: interactActionRef
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 145557432820001826, guid: 69459eaa3f31e0d44bea24f661023407, type: 3}
       propertyPath: switchableBehaviour
       value: 
       objectReference: {fileID: 3343685922543656914}
@@ -286,6 +290,9 @@ MonoBehaviour:
   actionName: Viajar
   isEnable:
     _value: 1
+  requirements:
+    AllMet:
+      _value: 0
   OnInteraction:
     m_PersistentCalls:
       m_Calls: []

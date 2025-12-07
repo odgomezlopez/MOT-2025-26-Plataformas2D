@@ -24,7 +24,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Interactor" Collapsed="true">
-    <Position X="8.5" Y="3" Width="1.5" />
+    <Position X="8.5" Y="3" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAEBAQCgAAAAAAUAAAEAAAAUAAAAAAAIAIAAAAAACEQ=</HashCode>
       <FileName>Assets\Utils\ContextualInteraction\_Scripts\Interactor.cs</FileName>
