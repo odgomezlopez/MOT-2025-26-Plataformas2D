@@ -28,8 +28,7 @@ public class GenericInteraction : MonoBehaviour, IInteraction
     #region Unity Life Cycle
     protected virtual void Awake()
     {
-        if (requirements == null)
-            requirements = new MultiMetEvaluator<IRequirement>(gameObject, true);
+        requirements = new MultiMetEvaluator<IRequirement>(gameObject, true);
     }
 
     protected virtual void OnEnable()

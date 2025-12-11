@@ -12,7 +12,7 @@ using UnityEditor.UIElements;
 public class MultiMetEvaluator<T> : IDisposable where T : class, IMet
 {
     T[] checks = Array.Empty<T>();
-    public ObservableValue<bool> AllMet { get; } = new ObservableValue<bool>();
+    public ObservableValue<bool> AllMet = new ObservableValue<bool>();
 
     bool initialized;
     bool subscribed;
@@ -57,6 +57,7 @@ public class MultiMetEvaluator<T> : IDisposable where T : class, IMet
     /// </summary>
     public void Subscribe()
     {
+        if (!initialized) return;
         if (subscribed) return;
         subscribed = true;
 
@@ -74,6 +75,7 @@ public class MultiMetEvaluator<T> : IDisposable where T : class, IMet
     /// </summary>
     public void Unsubscribe()
     {
+        if (!initialized) return;
         UnsubscribeInternal();
     }
 

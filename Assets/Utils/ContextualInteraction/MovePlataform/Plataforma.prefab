@@ -163,7 +163,7 @@ GameObject:
   m_Layer: 0
   m_Name: TargetPosition
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 1206586993520771344, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -288,11 +288,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovePlataform
   actionName: Viajar
+  priority: 1
   isEnable:
     _value: 1
-  requirements:
-    AllMet:
-      _value: 0
   OnInteraction:
     m_PersistentCalls:
       m_Calls: []

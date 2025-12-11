@@ -34,9 +34,6 @@ public class InteractorUI : MonoBehaviour
     Image textBackground;
     TextMeshProUGUI actionText;
 
-    Image keyBackground;
-    TextMeshProUGUI keyText;
-
     //====Internal====
     PressKeyFromAction pressKeyFromAction;
     bool initialized = false;
@@ -61,11 +58,6 @@ public class InteractorUI : MonoBehaviour
         textBackground = GetComponentInChildren<Image>();
         actionText = GetComponentInChildren<TextMeshProUGUI>();
 
-        if (pressKeyFromAction)
-        {
-            keyBackground = pressKeyFromAction.GetComponentInParent<Image>();
-            keyText = pressKeyFromAction.GetComponent<TextMeshProUGUI>();
-        }
         //Inicializamos los datos
         InitData();
     }
@@ -147,11 +139,13 @@ public class InteractorUI : MonoBehaviour
             Color bgColorKey = interactor.AllRequirementMet.Value ? availableKeyBackgroundColor : unavailableKeyBackgroundColor;
             Color txtColorKey = interactor.AllRequirementMet.Value ? availableKeyColor : unavailableKeyColor;
 
-            if (keyBackground != null)
-                keyBackground.color = bgColorKey;
-
-            if (keyText != null)
-                keyText.color = txtColorKey;
+            pressKeyFromAction.ChangeColors(txtColorKey, bgColorKey);
         }
+    }
+
+    private void OnValidate()
+    {
+        pressKeyFromAction = GetComponentInChildren<PressKeyFromAction>();
+        
     }
 }

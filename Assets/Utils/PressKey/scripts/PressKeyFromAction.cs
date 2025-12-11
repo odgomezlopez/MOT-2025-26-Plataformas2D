@@ -1,5 +1,4 @@
 ﻿
-using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -7,64 +6,25 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.DualShock;
 using UnityEngine.InputSystem.Switch;
 using UnityEngine.InputSystem.XInput;
-using UnityEngine.TextCore.Text;
+using UnityEngine.UI;
 
+[DisallowMultipleComponent]
 public class PressKeyFromAction : MonoBehaviour
 {
-    [SerializeField] InputActionReference inputAction;
+    [Header("Input")]
+    [SerializeField] private InputActionReference inputAction;
+    [Tooltip("Si se deja vacío, se usará el primer PlayerInput encontrado en la escena.")]
+    [SerializeField] private PlayerInput playerInput;
 
-    //Variables de inputs
-    PlayerInput playerInput;
-    string activeControlScheme;
+    [Header("UI")]
+    [SerializeField] private TextMeshProUGUI textComponent;
+    [Tooltip("Imagen opcional de fondo (por ejemplo, un keycap redondo detrás del símbolo).")]
+    [SerializeField] private Image backgroundImage;
+    [Tooltip("Texto a mostrar cuando no hay binding activo para el esquema actual.")]
+    [SerializeField] private string noBindingText = "—";
 
-    //Variables de UI
-    TextMeshProUGUI textComponent;//Require to use the font https://shinmera.github.io/promptfont/
-
-    #region keyToSymbol
-    private Dictionary<(string, string), string> symbols = new Dictionary<(string, string), string>
-    {
-        {("keyboard&mouse", "space"), "␺"},
-        {("keyboard&mouse", "leftarrow"), "←"},
-        {("keyboard&mouse", "rightarrow"), "→"},
-        {("keyboard&mouse", "uparrow"), "↑"},
-        {("keyboard&mouse", "downarrow"), "↓"},
-        //{("keyboard", "tab"), "␫"},
-
-        {("keyboard&mouse", "w"), "␣"}, //Move
-
-        {("keyboard&mouse", "delta"), "␾"},  //Mouse Left click
-        {("keyboard&mouse", "lmb"), "⟵"},  //Mouse Left click
-        {("keyboard&mouse", "rmb"), "⟶"}, //Mouse Right click
-
-        {("xbox", "rt"), "↗"},
-        {("xbox", "rb"), "↝"},
-        {("xbox", "rs"), "⇌"},
-
-        {("playstation", "a"), "⇣"},//X
-        {("playstation", "y"), "⇡"},//Triangle
-        {("playstation", "b"), "⇢"},//Circle
-        {("playstation", "x"), "⇠"},//Square
-
-        {("playstation", "lt"), "↖"},
-        {("playstation", "lb"), "↜"},
-        {("playstation", "ls"), "⇱"},
-
-        {("playstation", "rt"), "↗"},
-        {("playstation", "rb"), "↝"},
-        {("playstation", "rs"), "⇲"},
-
-        {("switch", "a"), "B"},
-        {("switch", "y"), "X"},
-        {("switch", "b"), "A"},
-        {("switch", "x"), "Y"},
-
-        {("gamepad", "rt"), "↗"},
-        {("gamepad", "rb"), "↝"},
-        {("gamepad", "rs"), "⇌"}
-
-    };
-
-    #endregion
+    // Control scheme actual
+    private string activeControlScheme;
 
     //Getters/Setters
     public InputActionReference InputActionRef { 
@@ -75,54 +35,84 @@ public class PressKeyFromAction : MonoBehaviour
         }
     }
 
+    #region Life Cycle
     private void Awake()
     {
         Init();
 
         // Initialize text with current binding
-        if(inputAction) UpdateDisplay();
+        UpdateDisplay();
     }
 
-    private void Init()
-    {
-        playerInput = FindFirstObjectByType<PlayerInput>();
-        textComponent = GetComponent<TextMeshProUGUI>();
-
-        activeControlScheme = playerInput.currentControlScheme;
-    }
 
     private void OnEnable()
     {
-        playerInput.onControlsChanged += OnControlsChanged;
+        Init();
+
+        if (playerInput != null)
+            playerInput.onControlsChanged += OnControlsChanged;
     }
 
     private void OnDisable()
     {
-        playerInput.onControlsChanged -= OnControlsChanged;
+        if (playerInput != null)
+            playerInput.onControlsChanged -= OnControlsChanged;
+    }
+    #endregion
+
+    #region Métodos públicos extra
+
+    /// <summary>
+    /// Fuerza un refresco de la UI (útil tras un rebinding en runtime).
+    /// </summary>
+    public void Refresh() => UpdateDisplay();
+
+    /// <summary>
+    /// Devuelve el texto/símbolo actualmente mostrado.
+    /// </summary>
+    public string GetCurrentDisplayText() => textComponent ? textComponent.text : string.Empty;
+
+    public void ChangeColors(Color textColor, Color backgroundColor)
+    {
+        if (textComponent)
+            textComponent.color = textColor;
+        if (backgroundImage)
+            backgroundImage.color = backgroundColor;
     }
 
-    private void Update()
+    #endregion
+
+    #region Metodos privados
+    private void Init()
     {
-        //if (Time.frameCount % 10 == 0)
-        //{
-        //    if (activeControlScheme != playerInput.currentControlScheme)
-        //    {
-        //        activeControlScheme = playerInput.currentControlScheme;
-        //        UpdateDisplay();
-        //    }
-        //}
-        //UpdateDisplay();
+        if (!textComponent)
+            textComponent = GetComponent<TextMeshProUGUI>();
+        if(!backgroundImage)
+            backgroundImage = GetComponentInChildren<Image>();
+
+
+        if (!playerInput)
+            playerInput = FindFirstObjectByType<PlayerInput>();
+
+        if (!playerInput)
+        {
+            Debug.LogWarning($"{nameof(PressKeyFromAction)}: No se ha encontrado ningún PlayerInput en la escena.", this);
+            return;
+        }
+
+        activeControlScheme = playerInput.currentControlScheme;
     }
 
     private void OnControlsChanged(PlayerInput obj)
     {
+        if (!playerInput) return;
+
         if (activeControlScheme != playerInput.currentControlScheme)
         {
             activeControlScheme = playerInput.currentControlScheme;
             UpdateDisplay();
         }
     }
-
 
     private void UpdateDisplay()
     {
@@ -132,59 +122,91 @@ public class PressKeyFromAction : MonoBehaviour
         textComponent.SetText(key);
     }
 
-    private string GetDisplayString() {
-        if (playerInput == null) Init();
-        //1. Defino las variables
-        string key= "No active binding";
-        string controlScheme = playerInput.currentControlScheme.ToLower();
-    
-        //2. Obtengo el binding
-        InputBinding activeBinding = InputActionRef.action.bindings
-             .FirstOrDefault(binding =>
-                 binding.groups
-                 .Split(";")
-                 .Any(scheme => scheme.ToLower() == controlScheme.ToLower())
-             );
-
-        key = activeBinding != default
-            ? activeBinding.ToDisplayString(InputBinding.DisplayStringOptions.DontIncludeInteractions) 
-            //activeBinding.effectivePath.Split("/")[1]
-            : "No active binding";
-
-
-        //3. Comrpuebo si estoy en consola;
-        if (controlScheme == "gamepad") controlScheme = GetDeviceType();
-
-        // 4. Comrpuebo si hay simbolo especial asociado
-        if (symbols.TryGetValue((controlScheme, key.ToLower()), out string symbol))
+    private string GetDisplayString()
+    {
+        if (playerInput == null)
         {
-            return symbol;
+            Init();
+            if (playerInput == null)
+                return noBindingText;
         }
 
-        return key; 
+        if (InputActionRef == null || InputActionRef.action == null)
+            return noBindingText;
+
+        string controlScheme = playerInput.currentControlScheme;
+        if (string.IsNullOrEmpty(controlScheme))
+            return noBindingText;
+
+        controlScheme = controlScheme.ToLowerInvariant();
+
+        // Buscar binding activo para el scheme
+        InputBinding activeBinding = InputActionRef.action.bindings
+            .FirstOrDefault(binding =>
+                !string.IsNullOrEmpty(binding.groups) &&
+                binding.groups
+                    .Split(';')
+                    .Any(scheme => scheme.Trim().ToLowerInvariant() == controlScheme));
+
+        if (activeBinding == default)
+            return noBindingText;
+
+        // Texto que saca Unity (ej: "A", "Cross", "Space", "Left Arrow"...)
+        string display = activeBinding.ToDisplayString(
+            InputBinding.DisplayStringOptions.DontIncludeInteractions);
+
+        // Si es gamepad, intento afinar a xbox / playstation / switch
+        string schemeForLookup = controlScheme == "gamepad"
+            ? GetDeviceType()
+            : controlScheme;
+
+        // 1º intento: usar display string
+        if (KeyToSymbol.TryGetSymbol(schemeForLookup, display, out string symbol))
+            return symbol;
+
+        // 2º intento: usar el nombre técnico del control (effectivePath)
+        string controlName = GetControlNameFromBinding(activeBinding);
+        if (KeyToSymbol.TryGetSymbol(schemeForLookup, controlName, out string symbolFromPath))
+            return symbolFromPath;
+
+        // Fallback: texto normal
+        return display;
     }
-  
+
+    private static string GetControlNameFromBinding(InputBinding binding)
+    {
+        if (string.IsNullOrEmpty(binding.effectivePath))
+            return string.Empty;
+
+        int lastSlash = binding.effectivePath.LastIndexOf('/');
+        return lastSlash >= 0 && lastSlash < binding.effectivePath.Length - 1
+            ? binding.effectivePath[(lastSlash + 1)..]
+            : binding.effectivePath;
+    }
+
     private string GetDeviceType()
     {
-        string deviceType = "none";
-        string controlScheme = playerInput.currentControlScheme.ToLower();
+        if (playerInput == null)
+            return "gamepad";
+
+        string controlScheme = playerInput.currentControlScheme.ToLowerInvariant();
 
         if (controlScheme == "keyboard&mouse")
-            deviceType = "keyboard&mouse";
-        else if (controlScheme == "gamepad")
+            return "keyboard&mouse";
+
+        if (controlScheme == "gamepad" && Gamepad.current != null)
         {
-            if (Gamepad.current != null)
+            return Gamepad.current switch
             {
-                deviceType = Gamepad.current switch
-                {
-                    DualShockGamepad => "playstation",
-                    XInputController => "xbox",
-                    SwitchProControllerHID => "switch",
-                    _ => "gamepad" // Generic gamepad if type is unknown
-                };
-            }
+                DualShockGamepad => "playstation",
+                XInputController => "xbox",
+                SwitchProControllerHID => "switch",
+                _ => "gamepad" // Generic gamepad if type is unknown
+            };
         }
+
         //TODO Añadir else if para XR, etc. 
-        return deviceType;
+        return controlScheme;
     }
+    #endregion
 }

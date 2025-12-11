@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3115068617620917818}
   - component: {fileID: 2074634378661167014}
   - component: {fileID: 1269894563759743197}
+  - component: {fileID: 1184852528932875182}
   m_Layer: 5
   m_Name: PressKeyFromAction
   m_TagString: Untagged
@@ -76,6 +77,23 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1184852528932875182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852608551694453273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c76479cd6cd14b4794690afe9b19533, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PressKeyFromAction
+  inputAction: {fileID: 0}
+  playerInput: {fileID: 0}
+  textComponent: {fileID: 8036480884835353620}
+  backgroundImage: {fileID: 1269894563759743197}
+  noBindingText: "\u2014"
 --- !u!1 &9165033874116268041
 GameObject:
   m_ObjectHideFlags: 0
@@ -87,7 +105,6 @@ GameObject:
   - component: {fileID: 3499971294608572738}
   - component: {fileID: 1915495011326569980}
   - component: {fileID: 8036480884835353620}
-  - component: {fileID: 6185196963336839406}
   m_Layer: 5
   m_Name: Key
   m_TagString: Untagged
@@ -213,16 +230,3 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &6185196963336839406
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9165033874116268041}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c76479cd6cd14b4794690afe9b19533, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inputAction: {fileID: 5480270880911870846, guid: ce8fa6f93f283d443841340b46f0d565, type: 3}

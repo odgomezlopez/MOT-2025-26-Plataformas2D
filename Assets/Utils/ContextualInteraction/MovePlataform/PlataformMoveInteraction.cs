@@ -1,10 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.Splines;
-using UnityEngine.UIElements;
 
 public class PlataformMoveInteraction : GenericInteraction
 {
@@ -21,7 +17,6 @@ public class PlataformMoveInteraction : GenericInteraction
 
     private void Start()
     {
-        //if(origin == null) origin = transform;
         targets.Add(transform.position);
         targets.Add(target.position);
         currentTarget = 1;
