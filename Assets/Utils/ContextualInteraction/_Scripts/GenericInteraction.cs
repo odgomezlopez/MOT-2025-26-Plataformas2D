@@ -20,7 +20,7 @@ public class GenericInteraction : MonoBehaviour, IInteraction
     [SerializeField] private MultiMetEvaluator<IRequirement> requirements;
     public ObservableValue<bool> AllRequirementMet => requirements?.AllMet;
 
-
+    
     //===Events===
     [Space(10)]
     public UnityEvent OnInteraction;
@@ -28,7 +28,8 @@ public class GenericInteraction : MonoBehaviour, IInteraction
     #region Unity Life Cycle
     protected virtual void Awake()
     {
-        requirements = new MultiMetEvaluator<IRequirement>(gameObject, true);
+        if (requirements == null)
+            requirements = new MultiMetEvaluator<IRequirement>(gameObject, true);
     }
 
     protected virtual void OnEnable()
@@ -46,6 +47,7 @@ public class GenericInteraction : MonoBehaviour, IInteraction
     public virtual void Activate(GameObject activator)
     {
         if (!IsEnable.Value) return;
+        if (AllRequirementMet != null && !AllRequirementMet.Value) return; // defensa extra
 
         OnInteraction?.Invoke();
     }

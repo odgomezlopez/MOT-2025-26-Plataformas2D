@@ -25,7 +25,7 @@ public class Interactor : MonoBehaviour
     //=== GETTERS & EVENTS ===
     public ObservableValue<bool> IsPlayerInArea => playerInAreaChecks?.AllMet;
     public ObservableValue<bool> IsActionEnable => Action?.IsEnable;
-    public ObservableValue<bool> AllRequiermentsMet => Action?.AllRequirementMet;
+    public ObservableValue<bool> AllRequirementMet => Action?.AllRequirementMet;
 
 
     #endregion
@@ -58,7 +58,7 @@ public class Interactor : MonoBehaviour
         {
             // auto-trigger when checks become true
             IsPlayerInArea.OnValueChanged += Execute;
-            AllRequiermentsMet.OnValueChanged += Execute;
+            AllRequirementMet.OnValueChanged += Execute;
             IsActionEnable.OnValueChanged += Execute;
 
         }
@@ -74,7 +74,7 @@ public class Interactor : MonoBehaviour
         else
         {
             IsPlayerInArea.OnValueChanged -= Execute;
-            AllRequiermentsMet.OnValueChanged -= Execute;
+            AllRequirementMet.OnValueChanged -= Execute;
             IsActionEnable.OnValueChanged -= Execute;
         }
 
@@ -100,7 +100,7 @@ public class Interactor : MonoBehaviour
         if (Action == null) return;
         if (!IsActionEnable.Value) return;
         if (!IsPlayerInArea.Value) return;
-        if (!AllRequiermentsMet.Value) return;
+        if (!AllRequirementMet.Value) return;
 
         Action.Activate(gameObject);
     }

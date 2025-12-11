@@ -12,42 +12,44 @@ using UnityEditor.UIElements;
 public class MultiMetEvaluator<T> : IDisposable where T : class, IMet
 {
     T[] checks = Array.Empty<T>();
-
-    public ObservableValue<bool> AllMet = new();
+    public ObservableValue<bool> AllMet { get; } = new ObservableValue<bool>();
 
     bool initialized;
     bool subscribed;
 
-    bool defaultValueOnEmpty = false;
+    bool metValueOnEmpty = false;
+    bool includeInactive = false;
 
-    public MultiMetEvaluator(GameObject root, bool metValueOnEmpy = false)
+    public MultiMetEvaluator(GameObject root, bool metValueOnEmpy = false, bool includeInactive = false)
     {
-        Init(root, metValueOnEmpy);
+        Init(root, metValueOnEmpy, includeInactive);
     }
 
     /// <summary>
     /// Looks for all IMet components in the given GameObject and its children.
     /// Does NOT subscribe automatically.
     /// </summary>
-    public void Init(GameObject root, bool metValueOnEmpty = false)
+    public void Init(GameObject root, bool metValueOnEmpty = false, bool includeInactive = false)
     {
+        //Store parameters
+        this.metValueOnEmpty = metValueOnEmpty;
+        this.includeInactive = includeInactive;
+
         // If we were already subscribed, clean up first
         UnsubscribeInternal();
 
-        this.defaultValueOnEmpty = metValueOnEmpty;
 
         if (root == null)
         {
             checks = Array.Empty<T>();
             initialized = false;
-            AllMet.Value = defaultValueOnEmpty;
+            AllMet.Value = this.metValueOnEmpty;
             return;
         }
 
-        // Grab all ICheck in this hierarchy (active and inactive)
-        checks = root.GetComponentsInChildren<T>();//includeInactive: true
+        checks = root.GetComponentsInChildren<T>(includeInactive);
         initialized = true;
-        AllMet.Value = defaultValueOnEmpty;
+        AllMet.Value = this.metValueOnEmpty;
     }
 
     /// <summary>
@@ -114,7 +116,7 @@ public class MultiMetEvaluator<T> : IDisposable where T : class, IMet
 
     bool EvaluateAll()
     {
-        if (checks == null || checks.Length == 0) return defaultValueOnEmpty;
+        if (checks == null || checks.Length == 0) return metValueOnEmpty;
 
         for (int i = 0; i < checks.Length; i++)
         {

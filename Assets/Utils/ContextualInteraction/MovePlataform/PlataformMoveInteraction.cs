@@ -19,8 +19,6 @@ public class PlataformMoveInteraction : GenericInteraction
     List<Vector3> targets = new List<Vector3>();
     int currentTarget;
 
-
-
     private void Start()
     {
         //if(origin == null) origin = transform;
