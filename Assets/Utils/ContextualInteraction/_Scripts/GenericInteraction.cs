@@ -15,6 +15,7 @@ public class GenericInteraction : MonoBehaviour, IInteraction
     [SerializeField] protected ObservableValue<bool> isEnable = new(true);
     public ObservableValue<bool> IsEnable => isEnable;
 
+    public void SetEnable(bool value) { IsEnable.Value = value;}
 
     //===Requierments===
     [SerializeField] private MultiMetEvaluator<IRequirement> requirements;
