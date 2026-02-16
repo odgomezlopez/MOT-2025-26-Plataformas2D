@@ -12,21 +12,14 @@ using UnityEditor.UIElements;
 public class ObservableValue<T>
 {
     [SerializeField] private T _value;
+    public T Value { get => _value; set => Set(value); }//Getter y setter para acceso directo
 
-    public event Action<T> OnValueChanged;
+    public event Action<T> OnValueChanged;//Evento que se dispara cuando el valor cambia
 
-
+    //Constructores
     public ObservableValue() {}
+    public ObservableValue(T v){_value = v;}
 
-    public ObservableValue(T v){
-        _value = v;
-    }
-
-    public T Value
-    {
-        get => _value;
-        set => Set(value);
-    }
 
     /// <summary>Sets the value and notifies listeners if it actually changed.</summary>
     public bool Set(T newValue)

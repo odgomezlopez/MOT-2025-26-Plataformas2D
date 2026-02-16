@@ -29,7 +29,5 @@ public class AnimatorController : MonoBehaviour
 
         animator.SetFloat("VelocityY", rb.linearVelocityY);
         animator.SetBool("IsGrounded", grounded2D.IsGroundedRaw);
-
-
     }
 }
