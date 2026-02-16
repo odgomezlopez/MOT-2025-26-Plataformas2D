@@ -22,11 +22,19 @@ public class AnimatorController : MonoBehaviour
 
         if(Mathf.Abs(rb.linearVelocityX) < 0.1) //Parado
             animator.SetFloat("VelocityX", 0);
-        else if (!move2D.IsRunning)
-            animator.SetFloat("VelocityX", 1); //Andando. Animación va a la velocidad normal
-        else
-            animator.SetFloat("VelocityX", 2); //Corriendo. Animación va al doble de la animación normal
-
+        else //Moviéndose
+        {
+            if (move2D) 
+            {
+                if (!move2D.IsRunning)
+                    animator.SetFloat("VelocityX", 1); //Andando. Animación va a la velocidad normal
+                else
+                    animator.SetFloat("VelocityX", 2); //Corriendo. Animación va al doble de la animación normal
+            }
+            else
+                animator.SetFloat("VelocityX", 1); 
+        }
+   
         animator.SetFloat("VelocityY", rb.linearVelocityY);
         animator.SetBool("IsGrounded", grounded2D.IsGroundedRaw);
     }
