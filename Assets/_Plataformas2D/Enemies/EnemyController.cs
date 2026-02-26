@@ -67,7 +67,6 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-
     void UpdateIdle()
     {
         idleTimer += Time.deltaTime;

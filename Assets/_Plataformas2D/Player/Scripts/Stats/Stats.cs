@@ -6,6 +6,9 @@ public class Stats
     [Header("Character data")]
     public string characterName;
 
+    [Header("Indicators")]
+    public ObservableRangedFloat HP;
+
     [Header("Move parameters")]
     public float moveSpeed = 5f;
     [Range(1f, 5f)] public float runModifier = 1.5f;
