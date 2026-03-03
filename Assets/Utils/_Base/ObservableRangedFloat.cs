@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 
 [System.Serializable]
 public class ObservableRangedFloat
@@ -21,7 +20,7 @@ public class ObservableRangedFloat
         float oldValue= _Value;
         _Value = Mathf.Clamp(newValue, 0, _MaxValue);
 
-        //if(oldValue != _Value) 
+        if(oldValue != _Value) 
             OnValueChanged?.Invoke(_Value, _MaxValue);
     }
 
@@ -32,6 +31,11 @@ public class ObservableRangedFloat
 
         //if (oldValue != _MaxValue) 
             OnValueChanged?.Invoke(_Value, _MaxValue);
+    }
+
+    public void ForceNotify()
+    {
+        OnValueChanged?.Invoke(_Value, _MaxValue);
     }
 
     public void Reset()

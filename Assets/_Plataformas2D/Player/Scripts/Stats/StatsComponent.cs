@@ -17,7 +17,6 @@ public class StatsComponent : MonoBehaviour, IDamageable
 
     private void OnValidate()
     {
-        stats.HP.Value = stats.HP.Value;
-        stats.HP.MaxValue = stats.HP.MaxValue;
+        stats.HP.ForceNotify();
     }
 }

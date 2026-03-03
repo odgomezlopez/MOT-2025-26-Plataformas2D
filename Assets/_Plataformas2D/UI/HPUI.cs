@@ -7,7 +7,7 @@ public class HPUI : MonoBehaviour
     [SerializeField] Image HPImage;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         //Buscamos la imagen
         if(HPImage == null) HPImage = GetComponent<Image>();
@@ -23,11 +23,13 @@ public class HPUI : MonoBehaviour
     //Me suscribo/desuscribo de los cambio de HP
     private void OnEnable()
     {
-       if(stats) stats.stats.HP.OnValueChanged += UpdateHP;
+        Debug.Log("HealthUI OnEnable ran");
+        if (stats) stats.stats.HP.OnValueChanged += UpdateHP;
     }
 
     private void OnDisable()
     {
+        Debug.Log("HealthUI OnEnable ran");
         if (stats) stats.stats.HP.OnValueChanged -= UpdateHP;
     }
     //Encargado de actualizar HP
