@@ -12,7 +12,7 @@ public class ObservableRangedFloat
     public float MaxValue { get => _MaxValue;set => SetMaxValue(value);}
 
     //Eventos
-    public event Action<float,float> OnValueChanged;//Evento que se dispara cuando el valor cambia
+    public event Action<float,float,float> OnValueChanged;//Evento que se dispara cuando el valor cambia
 
     //Funciones
     private void SetValue(float newValue)
@@ -21,7 +21,7 @@ public class ObservableRangedFloat
         _Value = Mathf.Clamp(newValue, 0, _MaxValue);
 
         if(oldValue != _Value) 
-            OnValueChanged?.Invoke(_Value, _MaxValue);
+            OnValueChanged?.Invoke(_Value, _MaxValue, oldValue);
     }
 
     private void SetMaxValue(float newValue)
@@ -29,13 +29,13 @@ public class ObservableRangedFloat
         float oldValue = _MaxValue;
         _MaxValue = Mathf.Max(newValue, 1);
 
-        //if (oldValue != _MaxValue) 
-            OnValueChanged?.Invoke(_Value, _MaxValue);
+        if (oldValue != _MaxValue) 
+            OnValueChanged?.Invoke(_Value, _MaxValue, oldValue);
     }
 
     public void ForceNotify()
     {
-        OnValueChanged?.Invoke(_Value, _MaxValue);
+        OnValueChanged?.Invoke(_Value, _MaxValue,0);
     }
 
     public void Reset()

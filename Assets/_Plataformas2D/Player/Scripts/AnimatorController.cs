@@ -6,6 +6,7 @@ public class AnimatorController : MonoBehaviour
     Rigidbody2D rb;
     IGrounded2D grounded2D;
     Move2D move2D;
+    StatsComponent stats;
 
     void Awake()
     {
@@ -13,6 +14,38 @@ public class AnimatorController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         grounded2D = GetComponentInChildren<IGrounded2D>();
         move2D = GetComponentInChildren<Move2D>();
+        stats = GetComponentInChildren<StatsComponent>();
+    }
+
+    //Me suscribo/desuscribo de los cambio de HP
+    private void OnEnable()
+    {
+        if (stats) stats.stats.HP.OnValueChanged += UpdateHP;
+    }
+
+    private void OnDisable()
+    {
+        if (stats) stats.stats.HP.OnValueChanged -= UpdateHP;
+    }
+
+    private void UpdateHP(float current, float max, float oldValue=0)
+    {
+        //Si tenemos la salud maxima no hacemos nada
+        if (current == max) return;
+
+        //Si nos hemos curado, no hacemos nada, porque aún no tenemos animación
+        if (current > oldValue) return;
+
+        //Si morimos
+        if (current == 0)
+        {
+            animator.SetTrigger("OnDie");
+        }
+        //Si recibimos daño
+        else
+        {
+            animator.SetTrigger("OnHurt");
+        }
     }
 
     // Update is called once per frame

@@ -23,17 +23,15 @@ public class HPUI : MonoBehaviour
     //Me suscribo/desuscribo de los cambio de HP
     private void OnEnable()
     {
-        Debug.Log("HealthUI OnEnable ran");
         if (stats) stats.stats.HP.OnValueChanged += UpdateHP;
     }
 
     private void OnDisable()
     {
-        Debug.Log("HealthUI OnEnable ran");
         if (stats) stats.stats.HP.OnValueChanged -= UpdateHP;
     }
     //Encargado de actualizar HP
-    private void UpdateHP(float current, float max)
+    private void UpdateHP(float current, float max, float oldValue=0)
     {
         if(max!=0) HPImage.fillAmount = current/max;
     }
