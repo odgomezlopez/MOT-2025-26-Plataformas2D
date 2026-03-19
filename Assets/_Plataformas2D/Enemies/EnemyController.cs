@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,7 +36,8 @@ public class EnemyController : MonoBehaviour
     Rigidbody2D rb;
     //IGrounded2D grounded2D;
 
-    void Start()
+
+    void Awake()
     {
         stats = GetComponent<StatsComponent>();
         rb = GetComponent<Rigidbody2D>();
@@ -53,6 +55,29 @@ public class EnemyController : MonoBehaviour
         //Si es enemigo volador, desactivo la gravedad
         if(enemyType==EnemyType.Flying) rb.gravityScale = 0;
     }
+    #region Suscribirse a cambios HP
+    private void OnEnable()
+    {
+        if (stats) stats.stats.HP.OnValueChanged += UpdateHP;
+    }
+
+    private void OnDisable()
+    {
+        if (stats) stats.stats.HP.OnValueChanged -= UpdateHP;
+    }
+    #endregion
+
+    private void UpdateHP(float current, float max, float oldValue = 0)
+    {
+        if (current == 0) StartCoroutine(OnEnemyDie());
+    }
+
+    private IEnumerator OnEnemyDie()
+    {
+        yield return null;
+        Destroy(gameObject);
+    }
+
 
     // Update is called once per frame
     void Update()

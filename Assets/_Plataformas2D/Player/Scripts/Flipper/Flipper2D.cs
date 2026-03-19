@@ -1,8 +1,12 @@
+using System;
 using UnityEngine;
 
 public class Flipper2D : MonoBehaviour
 {
+    //ObservableValue<bool> mFlipped;
+
     [SerializeField] bool facingRightByDefault = true;
+    public event Action<bool> OnFlipChanged;//Evento que se dispara cuando el valor cambia
 
     SpriteRenderer sprite;
     Rigidbody2D rb;
@@ -24,22 +28,14 @@ public class Flipper2D : MonoBehaviour
     private void Flip2D()
     {
         //Gestion el Flip
+        bool newFlipValue = sprite.flipX;
+        if (rb.linearVelocityX > 0.1f) newFlipValue = !facingRightByDefault; //Si nos movemos a la derecha
+        if (rb.linearVelocityX < -0.1f) newFlipValue = facingRightByDefault; // Si nos movemos a la izquierda
 
-        //Si nos movemos a la derecha
-        if (rb.linearVelocityX > 0.1f)
+        if (newFlipValue != sprite.flipX)
         {
-            sprite.flipX = !facingRightByDefault;
-            //Equivalente a
-            //if(facingRightByDefault) sprite.flipX = false;
-            //else sprite.flipX = true;
-        }
-
-        if (rb.linearVelocityX < -0.1f)
-        {
-            sprite.flipX = facingRightByDefault;
-            //Equivalente a
-            //if(facingRightByDefault) sprite.flipX = true;
-            //else sprite.flipX = false;
+            sprite.flipX = newFlipValue;
+            OnFlipChanged?.Invoke(isFacingRight());
         }
     }
 

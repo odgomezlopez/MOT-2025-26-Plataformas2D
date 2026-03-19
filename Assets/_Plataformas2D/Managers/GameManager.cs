@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour
     private IEnumerator GameOver()
     {
         OnGameOver?.Invoke();//Asociar efectos, filtros, etc.
+
         yield return new WaitForSecondsRealtime(gameOverDelay);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
