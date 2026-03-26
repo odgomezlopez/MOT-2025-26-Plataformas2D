@@ -32,12 +32,8 @@ public class Stats
     [Range(0f, 0.2f)] public float jumpBuffer = 0.08f;
 
     [Header("Attacks parameters")]
-    [SerializeField] public GameObject ataque1Prefab;
-    [SerializeField] public float ataque1Damage = 1f;
-    [SerializeField] public float ataque1AnimationSpeed = 1f;
-    [SerializeField] public float ataque1Speed = 1f;
-    [SerializeField] public float ataque1CoolDown = 0.5f;
-    [SerializeField] public bool ataque1DestroyOnDamage = true;
-    [SerializeField] public float ataque1TemporalInv = 0.5f;
-    [SerializeField] public float ataque1MaxLife = 2f; 
+    [SerializeField] public Action action1;
+    [SerializeField] public Action action1S;
+    [SerializeField] public Action action2;
+    [SerializeField] public Action action2S;
 }

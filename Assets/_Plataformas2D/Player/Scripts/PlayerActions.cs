@@ -1,19 +1,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Windows;
 
 public class PlayerActions : MonoBehaviour
 {
     //Referencias
     StatsComponent stats;
-    Flipper2D flipper;
 
     //Variable para saber si el modificador esta activo o no
     [SerializeField] bool modificador = false;
 
     //SpawnPoints
     [Header("Spawn Points")]
-    [SerializeField] Transform spawnPoint1;
+    [SerializeField] public Transform spawnPoint;
 
     //ColdDowns
     [Header("CoolDowns")]
@@ -25,9 +25,8 @@ public class PlayerActions : MonoBehaviour
     private void Awake()
     {
         stats = GetComponent<StatsComponent>();
-        flipper = GetComponent<Flipper2D>();
 
-        if(!spawnPoint1) spawnPoint1 = transform;
+        if(!spawnPoint) spawnPoint = transform;
 
         //Inicializamos los cooldown
         cooldownAtk1Normal = 0; 
@@ -57,13 +56,17 @@ public class PlayerActions : MonoBehaviour
     #region Metodos de conexión
     public void Action1(InputAction.CallbackContext context = default)
     {
-        if(modificador) Debug.Log("Action 1 Especial");
-        else Action1Normal(); 
+        if(modificador) UseAction(stats.stats.action1S);
+        else UseAction(stats.stats.action1);
+
+        //if (stats.action1Up & input.y > 0.5) stats.action1Up.Use(gameObject);
+        //else if (stats.action1Down & input.y < -0.5) stats.action1Down.Use(gameObject);
+        //else stats.action1.Use(gameObject);
     }
 
     public void Action2(InputAction.CallbackContext context = default) {
-        if (modificador) Debug.Log("Action 2 Special");
-        else Debug.Log("Action 2 Normal");
+        if (modificador) UseAction(stats.stats.action2S);
+        else UseAction(stats.stats.action2);
     }
 
     public void ActivarModifiador(InputAction.CallbackContext context = default)
@@ -78,54 +81,17 @@ public class PlayerActions : MonoBehaviour
     #endregion
 
     #region Metodos privados
-    private void Action1Normal()
+    private void UseAction(Action action)
     {
-        Debug.Log("Action 1 Normal");
+        //Comprobacaiones previas
+        if (action == null) return;
+
         //CoolDown
         if (cooldownAtk1Normal > 0) return;
-        cooldownAtk1Normal = stats.stats.ataque1CoolDown;
+        cooldownAtk1Normal = action.cooldown;
 
-        //Calculos generales
-        int direction = flipper.isFacingRight() ? 1 : -1;
-
-        //Instanciar Prefab de ataque
-        GameObject g = Instantiate(stats.stats.ataque1Prefab, spawnPoint1.position, Quaternion.identity); //,spawnPoint1
-        g.transform.localScale = new Vector3(g.transform.localScale.x * direction, g.transform.localScale.y, g.transform.localScale.z);//Giramos el ataque.
-
-        //Asegurar layer del ataque
-        g.layer = gameObject.layer;
-
-        //Cambiar los valores del script DoDamage del ataque para que haga el daño correcto, y que el origen del daño sea el jugador.
-         DoDamage doDamage = g.GetComponentInChildren<DoDamage>();
-         if(doDamage != null)
-         {
-            doDamage.attParent = g;//Asignamos el origen del ataque.
-
-            doDamage.damage = stats.stats.ataque1Damage; //Asignamos el daño del ataque segun lo que tengamos en el scriptable object de stats.
-            doDamage.destroyOnDamage = stats.stats.ataque1DestroyOnDamage; //Si qeremos que se destruya al hacer daño o no.
-            doDamage.gameObject.layer = gameObject.layer;//Asegurar layer del ataque
-        }
-
-        //Modificar velocidad del ataque, animacion
-        Animator animator = g.GetComponentInChildren<Animator>();
-        if (animator) animator.speed = stats.stats.ataque1AnimationSpeed;
-
-        //Invulnerabilidad durante ataque
-        stats.TemporalInvulnerability(stats.stats.ataque1TemporalInv,false,false);
-
-        //Hacer que los ataques a distancia se muevan hacia adelante (con RB o Script MoveTowards)
-        MoveFoward moveFoward = g.GetComponentInChildren<MoveFoward>();
-        if (moveFoward)
-        {
-            moveFoward.direction = new Vector2(direction, 0);
-            moveFoward.speed = stats.stats.ataque1Speed;
-        }
-        //TODO Efectos de sonido y visuales
-
-        //TODO Posibilidad cambiar animacion del zorrito
-
-        //Vida maxima
-        Destroy(g, stats.stats.ataque1MaxLife);
+        //Usar ataque
+        action.Execute(gameObject);
     }
     #endregion
 

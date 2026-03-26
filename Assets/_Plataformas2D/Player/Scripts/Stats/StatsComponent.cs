@@ -37,9 +37,9 @@ public class StatsComponent : MonoBehaviour, IDamageable
 
     public void TemporalInvulnerability(float invTime,bool ignoreColision=true,bool changeColor=true)
     {
-        stats.invulnerabilityChangeColor = changeColor;
-
         if (stats.invulnerability == true) return;
+
+        stats.invulnerabilityChangeColor = changeColor;
         StartCoroutine(HandleInvulnerability(invTime, ignoreColision));
     }
     private IEnumerator HandleInvulnerability(float invTime,bool ignoreColision = true)
