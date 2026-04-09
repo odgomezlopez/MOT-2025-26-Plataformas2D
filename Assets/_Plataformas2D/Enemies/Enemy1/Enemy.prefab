@@ -360,6 +360,7 @@ MonoBehaviour:
       _MaxValue: 3
     invulnerability: 0
     invulnerabilityDuration: 0.5
+    invulnerabilityChangeColor: 1
     invulnerabilityColor: {r: 1, g: 0, b: 0, a: 1}
     moveSpeed: 5
     runModifier: 1.5
@@ -369,6 +370,11 @@ MonoBehaviour:
     jumpForce: 10
     airMomentum: 0.8
     jumpBuffer: 0.08
+    action1: {fileID: 0}
+    action1S: {fileID: 0}
+    action2: {fileID: 0}
+    action2S: {fileID: 0}
+    scoreOnDie: 1
 --- !u!114 &3604125281317334608
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -426,7 +432,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoDamage
   damage: 1
+  instaKill: 0
   destroyOnDamage: 0
+  attParent: {fileID: 0}
 --- !u!1 &5680176039831036646
 GameObject:
   m_ObjectHideFlags: 0

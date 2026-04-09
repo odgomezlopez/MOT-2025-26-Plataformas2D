@@ -36,4 +36,8 @@ public class Stats
     [SerializeField] public Action action1S;
     [SerializeField] public Action action2;
     [SerializeField] public Action action2S;
+
+    [Header("Enemy parameters")]
+    [SerializeField] public int scoreOnDie = 1;
+
 }

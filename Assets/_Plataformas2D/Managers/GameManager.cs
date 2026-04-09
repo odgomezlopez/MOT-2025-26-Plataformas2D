@@ -1,11 +1,10 @@
 using System.Collections;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviourSingleton<GameManager>
 {
     [SerializeField] float gameOverDelay = 0.5f;
     [SerializeField] UnityEvent OnGameOver;
@@ -38,10 +37,18 @@ public class GameManager : MonoBehaviour
     //Encargado de actualizar HP
     private void UpdateHP(float current, float max, float oldValue = 0)
     {
-        if (current == 0) StartCoroutine(GameOver());
+        if (current == 0) StartCoroutine(GameOverCoroutine());
     }
 
-    private IEnumerator GameOver()
+    public void Win() { 
+        Debug.Log("Has ganado!");
+    }
+
+    public void GameOver() { 
+        StartCoroutine(GameOverCoroutine()); 
+    }
+
+    private IEnumerator GameOverCoroutine()
     {
         OnGameOver?.Invoke();//Asociar efectos, filtros, etc.
 

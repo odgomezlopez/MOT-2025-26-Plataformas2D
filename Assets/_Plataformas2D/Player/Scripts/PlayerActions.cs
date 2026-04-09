@@ -15,12 +15,6 @@ public class PlayerActions : MonoBehaviour
     [Header("Spawn Points")]
     [SerializeField] public Transform spawnPoint;
 
-    //ColdDowns
-    [Header("CoolDowns")]
-    [SerializeField] float cooldownAtk1Normal=0;
-    [SerializeField] float cooldownAtk1Sp = 0;
-    [SerializeField] float cooldownAtk2Normal = 0;
-    [SerializeField] float cooldownAtk2Sp = 0;
 
     private void Awake()
     {
@@ -29,29 +23,21 @@ public class PlayerActions : MonoBehaviour
         if(!spawnPoint) spawnPoint = transform;
 
         //Inicializamos los cooldown
-        cooldownAtk1Normal = 0; 
-        cooldownAtk1Sp = 0;
-        cooldownAtk2Normal= 0;
-        cooldownAtk2Sp = 0;
+        if (stats.stats.action1) stats.stats.action1.ResetCooldown();
+        if (stats.stats.action1S) stats.stats.action1S.ResetCooldown();
+
+        if (stats.stats.action2) stats.stats.action2.ResetCooldown();
+        if (stats.stats.action2S) stats.stats.action2S.ResetCooldown();
     }
 
     private void Update()
     {
-        UpdateCoolDown(ref cooldownAtk1Normal);
-        UpdateCoolDown(ref cooldownAtk1Sp);
-        UpdateCoolDown(ref cooldownAtk2Normal);
-        UpdateCoolDown(ref cooldownAtk2Sp);
-    }
+        if(stats.stats.action1) stats.stats.action1.UpdateCoolDown();
+        if (stats.stats.action1S) stats.stats.action1S.UpdateCoolDown();
 
-    private void UpdateCoolDown(ref float coolDown)
-    {
-        if (coolDown > 0)
-        {
-            coolDown -= Time.deltaTime;
-            if (coolDown < 0) coolDown = 0;
-        }
+        if (stats.stats.action2) stats.stats.action2.UpdateCoolDown();
+        if (stats.stats.action2S) stats.stats.action2S.UpdateCoolDown();
     }
-
 
     #region Metodos de conexión
     public void Action1(InputAction.CallbackContext context = default)
@@ -84,11 +70,10 @@ public class PlayerActions : MonoBehaviour
     private void UseAction(Action action)
     {
         //Comprobacaiones previas
-        if (action == null) return;
+        if (action == null || action.IsOnCooldown()) return;
 
         //CoolDown
-        if (cooldownAtk1Normal > 0) return;
-        cooldownAtk1Normal = action.cooldown;
+        action.StartCooldown();
 
         //Usar ataque
         action.Execute(gameObject);

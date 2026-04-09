@@ -69,12 +69,13 @@ public class EnemyController : MonoBehaviour
 
     private void UpdateHP(float current, float max, float oldValue = 0)
     {
-        if (current == 0) StartCoroutine(OnEnemyDie());
+        if (current == 0 && current != oldValue) StartCoroutine(OnEnemyDie());
     }
 
     private IEnumerator OnEnemyDie()
     {
         yield return null;
+        ScoreManager.Instance.AddScore(stats.stats.scoreOnDie);
         Destroy(gameObject);
     }
 

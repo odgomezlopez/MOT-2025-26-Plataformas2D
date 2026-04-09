@@ -19,6 +19,11 @@ public class StatsComponent : MonoBehaviour, IDamageable
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Enemy"), false);
     }
 
+    private void OnDestroy()
+    {
+        Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Enemy"), false);
+    }
+
     public void TakeDamage(float damage, GameObject org)
     {
         //Si el personaje es invulnerable, no se le hace daño

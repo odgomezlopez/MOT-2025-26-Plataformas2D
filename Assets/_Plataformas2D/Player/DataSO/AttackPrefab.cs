@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New AttackPrefab", menuName = "Attack/AttackPrefab", order = 1)]
+[CreateAssetMenu(fileName = "New AttackPrefab", menuName = "Action/AttackPrefab", order = 1)]
 public class AttackPrefab : Attack
 {
     [Header("AttackPrefab")]
@@ -21,6 +21,7 @@ public class AttackPrefab : Attack
     public override void Execute(GameObject usedBy)
     {
         base.Execute(usedBy);
+
         if (prefab == null)
         { 
             Debug.LogWarning("No prefab assigned for this attack.");
