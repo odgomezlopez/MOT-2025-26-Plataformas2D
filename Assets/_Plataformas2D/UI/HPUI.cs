@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class HPUI : MonoBehaviour
 {
-    [SerializeField] StatsComponent stats;
+    Stats stats;
     [SerializeField] Image HPImage;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -13,22 +13,22 @@ public class HPUI : MonoBehaviour
         if(HPImage == null) HPImage = GetComponent<Image>();
 
         //Buscamos los stats
-        if (stats == null) stats = GetComponentInParent<StatsComponent>();
-        if (stats == null) stats = FindFirstObjectByType<PlayerController>()?.GetComponent<StatsComponent>();
+        if (stats == null) stats = GetComponentInParent<IStatsComponent>()?.Stats ?? null;
+        if (stats == null) stats = FindFirstObjectByType<PlayerController>()?.GetComponent<IStatsComponent>().Stats;
 
         //Si tengo stats inicializo el HP
-        if (stats) UpdateHP(stats.stats.HP.Value, stats.stats.HP.MaxValue);
+        if (stats != null) UpdateHP(stats.HP.Value, stats.HP.MaxValue);
     }
 
     //Me suscribo/desuscribo de los cambio de HP
     private void OnEnable()
     {
-        if (stats) stats.stats.HP.OnValueChanged += UpdateHP;
+        if (stats != null) stats.HP.OnValueChanged += UpdateHP;
     }
 
     private void OnDisable()
     {
-        if (stats) stats.stats.HP.OnValueChanged -= UpdateHP;
+        if (stats != null) stats.HP.OnValueChanged -= UpdateHP;
     }
     //Encargado de actualizar HP
     private void UpdateHP(float current, float max, float oldValue=0)

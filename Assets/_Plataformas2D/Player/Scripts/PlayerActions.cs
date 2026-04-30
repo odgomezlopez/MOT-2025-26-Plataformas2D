@@ -6,7 +6,7 @@ using UnityEngine.Windows;
 public class PlayerActions : MonoBehaviour
 {
     //Referencias
-    StatsComponent stats;
+    PlayerStatsComponent stats;
 
     //Variable para saber si el modificador esta activo o no
     [SerializeField] bool modificador = false;
@@ -18,7 +18,7 @@ public class PlayerActions : MonoBehaviour
 
     private void Awake()
     {
-        stats = GetComponent<StatsComponent>();
+        stats = GameData.Instance.GetComponent<PlayerStatsComponent>();
 
         if(!spawnPoint) spawnPoint = transform;
 

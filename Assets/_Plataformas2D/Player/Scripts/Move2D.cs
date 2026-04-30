@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class Move2D : MonoBehaviour
@@ -11,7 +10,7 @@ public class Move2D : MonoBehaviour
     const float INPUT_DEADZONE = 0.1f;
 
     //Referencia a componentes
-    StatsComponent statsComponent;
+    IStatsComponent statsComponent;
     Rigidbody2D rb;
     IGrounded2D grounded2D;
 
@@ -20,7 +19,7 @@ public class Move2D : MonoBehaviour
     {
         isRunning = false;
         rb = GetComponent<Rigidbody2D>();
-        statsComponent = GetComponent<StatsComponent>();
+        statsComponent = GetComponent<IStatsComponent>();
         grounded2D = GetComponentInChildren<IGrounded2D>();
     }
 
@@ -56,7 +55,7 @@ public class Move2D : MonoBehaviour
     private void FixedUpdate()
     {
         // === 0. Accesos rápidos ===
-        var stats = statsComponent.stats;
+        var stats = statsComponent.Stats;
 
         bool grounded = grounded2D != null && grounded2D.IsGroundedRaw;
         bool hasInput = Mathf.Abs(inputX) > 0f; // ya aplicamos deadzone en Move

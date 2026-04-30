@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Ataque 1
   m_EditorClassIdentifier: Assembly-CSharp::AttackPrefab
   actionName: Ataque basico
-  cooldown: 5
+  cooldown: 1
   cooldownTimer: 0
   damage: 1
   temporalInv: 0.5

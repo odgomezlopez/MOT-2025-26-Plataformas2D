@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class AnimatorController : MonoBehaviour
 {
-    StatsComponent stats;
+    IStatsComponent stats;
 
     Animator animator;
     Rigidbody2D rb;
@@ -19,7 +19,7 @@ public class AnimatorController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         grounded2D = GetComponentInChildren<IGrounded2D>();
         move2D = GetComponentInChildren<Move2D>();
-        stats = GetComponentInChildren<StatsComponent>();
+        stats = GetComponentInChildren<IStatsComponent>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
         colorBase = spriteRenderer.color;
@@ -30,20 +30,20 @@ public class AnimatorController : MonoBehaviour
     //Me suscribo/desuscribo de los cambio de HP
     private void OnEnable()
     {
-        if (stats) stats.stats.HP.OnValueChanged += UpdateHP;
+        if (stats.Stats != null) stats.Stats.HP.OnValueChanged += UpdateHP;
     }
 
     private void OnDisable()
     {
-        if (stats) stats.stats.HP.OnValueChanged -= UpdateHP;
+        if (stats.Stats != null) stats.Stats.HP.OnValueChanged -= UpdateHP;
     }
 
     // Update is called once per frame
     void Update()
     {
         //Gestionar color invulnerablidad
-        if (stats.stats.invulnerability)
-            if(stats.stats.invulnerabilityChangeColor) spriteRenderer.color = stats.stats.invulnerabilityColor;
+        if (stats.Stats.invulnerability)
+            if(stats.Stats.invulnerabilityChangeColor) spriteRenderer.color = stats.Stats.invulnerabilityColor;
         else
             spriteRenderer.color = colorBase;
 

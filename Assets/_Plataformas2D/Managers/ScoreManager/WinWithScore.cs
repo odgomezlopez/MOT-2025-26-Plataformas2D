@@ -8,12 +8,12 @@ public class WinWithScore : MonoBehaviour
 
     private void OnEnable()
     {
-        ScoreManager.Instance.Score.OnValueChanged += CheckWinCondition;
+        if(ScoreManager.Instance) ScoreManager.Instance.Score.OnValueChanged += CheckWinCondition;
     }
 
     private void OnDisable()
     {
-        ScoreManager.Instance.Score.OnValueChanged -= CheckWinCondition;
+        if(ScoreManager.Instance) ScoreManager.Instance.Score.OnValueChanged -= CheckWinCondition;
     }
 
     private void CheckWinCondition(int currentScore)

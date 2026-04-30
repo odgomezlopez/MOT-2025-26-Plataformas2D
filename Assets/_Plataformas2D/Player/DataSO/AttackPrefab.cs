@@ -29,7 +29,7 @@ public class AttackPrefab : Attack
         }
 
         //Inicializaciones
-        StatsComponent stats = usedBy.GetComponent<StatsComponent>();
+        IStatsComponent stats = usedBy.GetComponent<IStatsComponent>();
         Flipper2D flipper = usedBy.GetComponentInChildren<Flipper2D>();
         PlayerActions playerActions = usedBy.GetComponent<PlayerActions>();
 
@@ -77,7 +77,8 @@ public class AttackPrefab : Attack
         if (animator) animator.speed = animationSpeed;
 
         //Invulnerabilidad durante ataque
-        stats.TemporalInvulnerability(temporalInv, false, false);
+        DamageDetector detector = usedBy.GetComponentInChildren<DamageDetector>();
+        if(detector) detector.TemporalInvulnerability(temporalInv, false, false);
 
         //Hacer que los ataques a distancia se muevan hacia adelante (con RB o Script MoveTowards)
         MoveFoward moveFoward = g.GetComponentInChildren<MoveFoward>();

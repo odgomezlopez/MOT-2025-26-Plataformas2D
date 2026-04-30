@@ -6,30 +6,40 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourSingleton<GameManager>
 {
-    [SerializeField] float gameOverDelay = 0.5f;
-    [SerializeField] UnityEvent OnGameOver;
+    //Win
+    [Scene, SerializeField] string nextScene;
+    [SerializeField, Range(0f,3f)] float winDelay = 0.5f;
+    [SerializeField] UnityEvent OnWin;
 
+    //GameOver
+    [SerializeField, Range(0f, 3f)] float gameOverDelay = 0.5f;
+    [SerializeField] public UnityEvent OnGameOver;
+
+    //Referencias
     PlayerController controller;
-    StatsComponent stats;
+    PlayerStats stats;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
         //Inicializamos las referencias
         controller = FindFirstObjectByType<PlayerController>();
-        stats = controller?.GetComponent<StatsComponent>();
+        stats = (PlayerStats) GameData.Instance.GetComponent<IStatsComponent>().Stats;
+
+        //if (stats.HP.Value == 0) 
+            stats.HP.Reset();
     }
 
     #region Suscripciones
     //Me suscribo/desuscribo de los cambio de HP
     private void OnEnable()
     {
-        if (stats) stats.stats.HP.OnValueChanged += UpdateHP;
+        if (stats != null) stats.HP.OnValueChanged += UpdateHP;
     }
 
     private void OnDisable()
     {
-        if (stats) stats.stats.HP.OnValueChanged -= UpdateHP;
+        if (stats != null) stats.HP.OnValueChanged -= UpdateHP;
     }
     #endregion
 
@@ -40,20 +50,33 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         if (current == 0) StartCoroutine(GameOverCoroutine());
     }
 
-    public void Win() { 
-        Debug.Log("Has ganado!");
+    public void Win() {
+        StartCoroutine(WinCoroutine());
     }
 
     public void GameOver() { 
         StartCoroutine(GameOverCoroutine()); 
     }
+    private IEnumerator WinCoroutine()
+    {
+        OnWin?.Invoke();//Asociar efectos, filtros, etc.
+        ScoreManager.Instance.SaveScore();
+        InventoryManager.Instance.SaveInventory();
+
+        yield return new WaitForSecondsRealtime(winDelay);
+        SceneLoaderManager.Instance.LoadScene(nextScene);
+    }
 
     private IEnumerator GameOverCoroutine()
     {
         OnGameOver?.Invoke();//Asociar efectos, filtros, etc.
+        ScoreManager.Instance.ResetScore();
+        InventoryManager.Instance.ResetInventory();
+
 
         yield return new WaitForSecondsRealtime(gameOverDelay);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneLoaderManager.Instance.RestartScene();
+        //ScoreManager.Instance.Score.Value = 0;
     }
     #endregion
 

@@ -11,7 +11,7 @@ public class Jump2D : MonoBehaviour
 
 
     //Compponents
-    StatsComponent statsComponent;
+    IStatsComponent statsComponent;
     private Rigidbody2D _rb;
     private IGrounded2D _grounded;
 
@@ -21,7 +21,7 @@ public class Jump2D : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody2D>();
         _grounded = GetComponentInChildren<IGrounded2D>();
-        statsComponent = GetComponent<StatsComponent>();
+        statsComponent = GetComponent<IStatsComponent>();
     }
 
     public void Jump(InputAction.CallbackContext context = default)
@@ -39,7 +39,7 @@ public class Jump2D : MonoBehaviour
         if (_grounded == null) return;
 
         // Jump if: recently pressed AND currently grounded (your IGrounded2D can include coyote)
-        bool pressedRecently = (Time.time - _lastJumpPressed) <= statsComponent.stats.jumpBuffer;
+        bool pressedRecently = (Time.time - _lastJumpPressed) <= statsComponent.Stats.jumpBuffer;
         
         
         if (pressedRecently && (_grounded.IsGrounded))
@@ -52,7 +52,7 @@ public class Jump2D : MonoBehaviour
     private void DoJump()
     {
         // Set vertical velocity directly for consistent jumps
-        _rb.linearVelocityY = statsComponent.stats.jumpForce;
+        _rb.linearVelocityY = statsComponent.Stats.jumpForce;
         //_rb.AddForce(Vector2.up* jumpVelocity, ForceMode2D.Impulse);
         OnJump?.Invoke();
     }

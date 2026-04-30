@@ -18,7 +18,7 @@ public enum EnemyState
 public class EnemyController : MonoBehaviour
 {
     [Header("Basic Data")]
-    StatsComponent stats;
+    EnemyStatsComponent stats;
 
     [SerializeField] EnemyState enemyState = EnemyState.Idle;
     [SerializeField] EnemyType enemyType = EnemyType.Normal;
@@ -39,7 +39,7 @@ public class EnemyController : MonoBehaviour
 
     void Awake()
     {
-        stats = GetComponent<StatsComponent>();
+        stats = GetComponent<EnemyStatsComponent>();
         rb = GetComponent<Rigidbody2D>();
         //grounded2D = GetComponentInChildren<IGrounded2D>();
 

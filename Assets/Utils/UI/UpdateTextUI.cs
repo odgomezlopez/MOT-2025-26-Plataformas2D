@@ -9,34 +9,30 @@ using static System.Net.Mime.MediaTypeNames;
 
 public class UpdateTextUI : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI textUI;
+    TextMeshProUGUI textUI;
+
+    [SerializeField] Color enableColor = Color.black;
+    [SerializeField] Color disableColor = Color.gray;
 
     private void Awake()
     {
-        // Fallback if not assigned in the Inspector
-        if (textUI == null)
-            textUI = GetComponent<TextMeshProUGUI>();
+        textUI = GetComponent<TextMeshProUGUI>();
     }
-
-    /// <summary>
-    /// Updates the text with optional color.
-    /// </summary>
-    public void UpdateText(string text, Color? color = null)
+    public void UpdateText(string text)
     {
         textUI.SetText(text);
-
-        // Only apply color if one was provided
-        if (color.HasValue)
-        {
-            textUI.color = color.Value;
-        }
     }
 
-    /// <summary>
-    /// Overload for float values. Converts the float to string and calls the main UpdateText.
-    /// </summary>
-    public void UpdateText(float value, Color? color = null)
+    public void UpdateText(string text, bool enable)
     {
-        UpdateText(value.ToString(), color);
+        UpdateText(text);
+
+        if (enable) textUI.color = enableColor;
+        else textUI.color = disableColor;
+    }
+
+    public void UpdateText(float value)
+    {
+        textUI.SetText(value.ToString()); ;//Si se quiere un formato se puede dar en los parametros de toString
     }
 }

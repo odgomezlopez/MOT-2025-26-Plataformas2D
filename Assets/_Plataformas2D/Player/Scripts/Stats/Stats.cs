@@ -30,14 +30,21 @@ public class Stats
     [Range(0f,1f)] public float airMomentum = 0.8f;
 
     [Range(0f, 0.2f)] public float jumpBuffer = 0.08f;
+}
 
+[System.Serializable]
+public class PlayerStats: Stats
+{
     [Header("Attacks parameters")]
     [SerializeField] public Action action1;
     [SerializeField] public Action action1S;
     [SerializeField] public Action action2;
     [SerializeField] public Action action2S;
+}
 
-    [Header("Enemy parameters")]
+[System.Serializable]
+public class EnemyStats : Stats
+{
+    [Header("Enemy score")]
     [SerializeField] public int scoreOnDie = 1;
-
 }

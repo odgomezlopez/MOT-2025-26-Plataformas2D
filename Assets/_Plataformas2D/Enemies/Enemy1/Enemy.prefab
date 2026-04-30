@@ -88,7 +88,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b5b06595481b2f4f992f3c5bba2a683, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HPUI
-  stats: {fileID: 8563838480400968590}
   HPImage: {fileID: 8565033012000783116}
 --- !u!1 &2454364970835256272
 GameObject:
@@ -283,11 +282,12 @@ GameObject:
   m_Component:
   - component: {fileID: 7288836460527842030}
   - component: {fileID: 2378802343078713561}
-  - component: {fileID: 8563838480400968590}
+  - component: {fileID: 2604929421826154887}
   - component: {fileID: 3604125281317334608}
   - component: {fileID: 4497283078080053753}
   - component: {fileID: 5919313132916848084}
   - component: {fileID: 1051668708365928953}
+  - component: {fileID: 3124314711565802799}
   m_Layer: 7
   m_Name: Enemy
   m_TagString: Untagged
@@ -341,7 +341,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &8563838480400968590
+--- !u!114 &2604929421826154887
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -350,13 +350,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 5566296270048016955}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34de854e1c669194bad771e88182dd5e, type: 3}
+  m_Script: {fileID: 11500000, guid: 151ce34b62927bc4a984bc53cb18de5b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::StatsComponent
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStatsComponent
   stats:
     characterName: Enemy 1
     HP:
-      _Value: 2
+      _Value: 3
       _MaxValue: 3
     invulnerability: 0
     invulnerabilityDuration: 0.5
@@ -370,10 +370,6 @@ MonoBehaviour:
     jumpForce: 10
     airMomentum: 0.8
     jumpBuffer: 0.08
-    action1: {fileID: 0}
-    action1S: {fileID: 0}
-    action2: {fileID: 0}
-    action2S: {fileID: 0}
     scoreOnDie: 1
 --- !u!114 &3604125281317334608
 MonoBehaviour:
@@ -435,6 +431,18 @@ MonoBehaviour:
   instaKill: 0
   destroyOnDamage: 0
   attParent: {fileID: 0}
+--- !u!114 &3124314711565802799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566296270048016955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a8fcd4a27017764c956eba75d3e5764, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageDetector
 --- !u!1 &5680176039831036646
 GameObject:
   m_ObjectHideFlags: 0
