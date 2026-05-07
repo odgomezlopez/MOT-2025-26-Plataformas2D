@@ -6,8 +6,9 @@ public class GameData : MonoBehaviourSingleton<GameData>
 {
     public ObservableValue<int> nMuertes;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         nMuertes.Value = PlayerPrefs.GetInt("nMuertes", 0);
     }
 

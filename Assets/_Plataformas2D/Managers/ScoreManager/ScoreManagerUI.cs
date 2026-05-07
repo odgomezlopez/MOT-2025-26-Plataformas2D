@@ -17,7 +17,7 @@ public class ScoreManagerUI : MonoBehaviour
 
     private void OnDisable()
     {
-        ScoreManager.Instance.Score.OnValueChanged -= UpdateScoreText;
+        if(ScoreManager.Instance) ScoreManager.Instance.Score.OnValueChanged -= UpdateScoreText;
     }
 
     private void UpdateScoreText(int newScore)

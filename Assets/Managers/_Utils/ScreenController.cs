@@ -1,97 +1,105 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.XInput;
 using UnityEngine.UI;
 
 public class ScreenController : MonoBehaviour
 {
-    //Internal references
-    Canvas canvas;
-    PlayerInput playerInput;
-
     [Header("Action map")]
-    [SerializeField] string newActionMap;
-    string oldActionMap;
-
+    [SerializeField] protected string newActionMap;
+    protected string oldActionMap;
 
     [Header("Actions")]
-    [SerializeField] InputActionReference showAction;
-    [SerializeField] InputActionReference hideAction;
+    [SerializeField] private InputActionReference showAction;
+    [SerializeField] private InputActionReference hideAction;
 
     [Header("UI references")]
-    [SerializeField] Selectable firstSelectObject;
+    [SerializeField] private Selectable firstSelectObject;
 
-    //Guardamo el fixedDetalTime para poder pausar bien
-    private float fixedDeltaTime;
+    [Header("Behaviour")]
+    [SerializeField] private bool pauseGameWhenVisible = true;
 
-    void Awake()
+    private PlayerInput _playerInput;
+    private PlayerInput PlayerInput
     {
-        this.fixedDeltaTime = Time.fixedDeltaTime;
+        get
+        {
+            if (_playerInput == null)
+                _playerInput = FindFirstObjectByType<PlayerInput>();
+            return _playerInput;
+        }
     }
 
-    void Start()
+    private Canvas canvas;
+    private bool isVisible;
+    private bool eventLinked;
+
+    protected virtual void Awake()
     {
         canvas = GetComponent<Canvas>();
-        playerInput = FindObjectOfType<PlayerInput>();
-        canvas.enabled = false;
+        if (canvas == null)
+            Debug.LogError($"[ScreenController] No Canvas on '{gameObject.name}'.", gameObject);
     }
 
-    public virtual void OnEnable()
+    private void Start()
     {
-        if(showAction)showAction.action.performed += ShowScreenConnector;
-        if (hideAction) hideAction.action.performed += HideScreenConnector;
-
+        if (canvas != null) canvas.enabled = false;
     }
 
-    public virtual void OnDisable()
+    protected virtual void OnEnable()
+    {
+        if (eventLinked) return;
+        if (showAction) showAction.action.performed += ShowScreenConnector;
+        if (hideAction) hideAction.action.performed += HideScreenConnector;
+        eventLinked = true;
+    }
+
+    protected virtual void OnDisable()
     {
         if (showAction) showAction.action.performed -= ShowScreenConnector;
         if (hideAction) hideAction.action.performed -= HideScreenConnector;
+        eventLinked = false;
     }
 
-
-
-    public virtual void ShowScreenConnector(InputAction.CallbackContext context = default)
-    {
-        ShowScreen();
-    }
-
+    public void ShowScreenConnector(InputAction.CallbackContext _ = default) => ShowScreen();
+    public void HideScreenConnector(InputAction.CallbackContext _ = default) => HideScreen();
 
     public virtual void ShowScreen()
     {
-        canvas.enabled = true;
-        oldActionMap = playerInput.currentActionMap.name;
-        playerInput.SwitchCurrentActionMap(newActionMap);
+        if (isVisible) return;
+        if (canvas == null || PlayerInput == null)
+        {
+            Debug.LogWarning($"[ScreenController] ShowScreen called but references not ready on '{gameObject.name}'.");
+            return;
+        }
 
-        //Pausar
-        ChangeTimeScale(0f);
+        isVisible = true;
+        canvas.enabled = true;
+
+        oldActionMap = PlayerInput.currentActionMap?.name;
+        if (!string.IsNullOrEmpty(newActionMap))
+            PlayerInput.SwitchCurrentActionMap(newActionMap);
+
+        if (pauseGameWhenVisible) Time.timeScale = 0f;
         firstSelectObject?.Select();
     }
 
-    public void HideScreenConnector(InputAction.CallbackContext context = default)
-    {
-        HideScreen();
-    }
-    
     public virtual void HideScreen()
     {
+        if (!isVisible) return;
+        if (canvas == null || PlayerInput == null) return;
+
+        isVisible = false;
         canvas.enabled = false;
-        playerInput.SwitchCurrentActionMap(oldActionMap);
 
-        //Despausar
-        ChangeTimeScale(1f);
+        if (!string.IsNullOrEmpty(oldActionMap))
+            PlayerInput.SwitchCurrentActionMap(oldActionMap);
 
+        if (pauseGameWhenVisible) Time.timeScale = 1f;
     }
+
     private void OnDestroy()
     {
-        ChangeTimeScale(1f);
-    }
-
-    private void ChangeTimeScale(float newScale)
-    {
-        Time.timeScale = newScale;
+        // Only restore time scale if we were the ones who paused it.
+        if (isVisible && pauseGameWhenVisible) Time.timeScale = 1f;
     }
 }

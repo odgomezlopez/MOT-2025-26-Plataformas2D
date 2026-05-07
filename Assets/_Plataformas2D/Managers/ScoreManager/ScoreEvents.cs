@@ -18,12 +18,12 @@ public class ScoreEvents : MonoBehaviour
     //Me suscribo/desuscribo a los cambios de puntuación
     private void OnEnable()
     {
-        ScoreManager.Instance.Score.OnValueChanged += CheckEvents;
+        if (ScoreManager.Instance) ScoreManager.Instance.Score.OnValueChanged += CheckEvents;
     }
 
     private void OnDisable()
     {
-        ScoreManager.Instance.Score.OnValueChanged -= CheckEvents;
+        if (ScoreManager.Instance) ScoreManager.Instance.Score.OnValueChanged -= CheckEvents;
     }
 
     //Compruebo si se han alcanzado los valores de puntuación para activar los eventos correspondientes

@@ -9,6 +9,11 @@ public class AnimationEvents : MonoBehaviour
 
     public void DestroyParent()
     {
-        Destroy(gameObject.transform.parent.gameObject); 
+        try
+        {
+            Destroy(gameObject.transform.parent.gameObject);
+        } catch {
+            Destroy(gameObject.transform);
+        }
     }
 }

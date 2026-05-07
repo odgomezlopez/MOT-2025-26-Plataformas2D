@@ -1,6 +1,8 @@
 using UnityEngine;
 
-public class PlayerStatsComponetConnector : MonoBehaviour, IStatsComponent
+public class PlayerStatsComponentConnector : MonoBehaviour, IStatsComponent
 {
-    public Stats Stats => GameData.Instance.GetComponent<PlayerStatsComponent>().Stats;
+    public Stats Stats => GameData.Instance != null
+        ? GameData.Instance.GetComponent<PlayerStatsComponent>()?.Stats
+        : null;
 }

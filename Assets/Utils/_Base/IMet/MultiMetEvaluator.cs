@@ -63,7 +63,7 @@ public class MultiMetEvaluator<T> : IDisposable where T : class, IMet
 
         foreach (var check in checks)
         {
-            if (check == null) continue;
+            if (check == null || check.IsMet == null) continue;
             check.IsMet.OnValueChanged += OnCheckValueChanged;
         }
 
@@ -123,7 +123,7 @@ public class MultiMetEvaluator<T> : IDisposable where T : class, IMet
         for (int i = 0; i < checks.Length; i++)
         {
             var check = checks[i];
-            if (check == null) continue;
+            if (check == null || check.IsMet == null) continue;
             if (!check.IsMet.Value)
                 return false;
         }

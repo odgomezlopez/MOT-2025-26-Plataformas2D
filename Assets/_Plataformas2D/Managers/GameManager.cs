@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     //Win
     [Scene, SerializeField] string nextScene;
     [SerializeField, Range(0f,3f)] float winDelay = 0.5f;
-    [SerializeField] UnityEvent OnWin;
+    [SerializeField] public UnityEvent OnWin;
 
     //GameOver
     [SerializeField, Range(0f, 3f)] float gameOverDelay = 0.5f;
@@ -20,8 +20,9 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     PlayerStats stats;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         //Inicializamos las referencias
         controller = FindFirstObjectByType<PlayerController>();
         stats = (PlayerStats) GameData.Instance.GetComponent<IStatsComponent>().Stats;

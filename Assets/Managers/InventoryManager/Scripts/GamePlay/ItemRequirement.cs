@@ -18,13 +18,13 @@ public class ItemRequirement : MonoBehaviour, IRequirement
     public void OnEnable()
     {
         isMet = new ObservableValue<bool>(false);
-        InventoryManager.Instance.OnInventoryChange += CheckRequirement;
+        if (InventoryManager.Instance) InventoryManager.Instance.OnInventoryChange += CheckRequirement;
         CheckRequirement();
     }
 
     public void OnDisable()
     {
-        InventoryManager.Instance.OnInventoryChange -= CheckRequirement;
+        if(InventoryManager.Instance) InventoryManager.Instance.OnInventoryChange -= CheckRequirement;
     }
 
     private void CheckRequirement()

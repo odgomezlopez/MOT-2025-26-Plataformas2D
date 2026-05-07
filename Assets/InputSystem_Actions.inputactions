@@ -1154,6 +1154,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Dialogue",
+            "id": "cb4fd829-04e2-4ecb-b04c-9d5c22fdbe43",
+            "actions": [
+                {
+                    "name": "Next",
+                    "type": "Button",
+                    "id": "59965fb2-ea9e-44aa-a1bf-c0ce9f594924",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "aa13371b-920e-4c04-bdda-7842d68c7f6c",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Next",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [
