@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,6 +17,7 @@ public class DialogueDesign : MonoBehaviour
     [SerializeField] private string hideAdviceTrigger = "hideAdvice";
 
     [Header("UI references")]
+    Canvas canvas;
     [SerializeField] private TypewriterText dialogueText;
     [SerializeField] private Image backgroundImage;
     [SerializeField] private Image portrait;
@@ -23,13 +25,29 @@ public class DialogueDesign : MonoBehaviour
 
     public TypewriterText DialogueText => dialogueText;
 
+    private void Awake()
+    {
+        canvas = GetComponent<Canvas>();
+        canvas.enabled = false; // Start disabled, animator will enable when needed
+    }
+
     private void Reset()
     {
         if (animator == null) animator = GetComponent<Animator>();
     }
 
-    public void Show() => SafeTrigger(showDialogueTrigger);
-    public void Hide() => SafeTrigger(hideDialogueTrigger);
+    public void Show(bool animated = false)
+    {
+        ResetAllAnimatorTriggers(animator);
+        canvas.enabled = true;
+        if(animated) SafeTrigger(showDialogueTrigger);
+    }
+    public void Hide(bool animated = false)
+    {
+        if(animated) SafeTrigger(hideDialogueTrigger); //The animation should disable the canvas
+        else canvas.enabled = false;
+        ResetAllAnimatorTriggers(animator);
+    }
     public void ShowAdvice() => SafeTrigger(showAdviceTrigger);
     public void HideAdvice() => SafeTrigger(hideAdviceTrigger);
 
@@ -50,7 +68,19 @@ public class DialogueDesign : MonoBehaviour
 
     private void SafeTrigger(string trigger)
     {
+        ResetAllAnimatorTriggers(animator);
         if (animator != null && !string.IsNullOrEmpty(trigger))
             animator.SetTrigger(trigger);
+    }
+
+    public void ResetAllAnimatorTriggers(Animator animator)
+    {
+        foreach (var trigger in animator.parameters)
+        {
+            if (trigger.type == AnimatorControllerParameterType.Trigger)
+            {
+                animator.ResetTrigger(trigger.name);
+            }
+        }
     }
 }

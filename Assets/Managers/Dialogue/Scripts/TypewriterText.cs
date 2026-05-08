@@ -9,6 +9,7 @@ public class TypewriterText : MonoBehaviour
     [SerializeField] private float punctuationPause = 0.2f;
     [SerializeField] private float commaPause = 0.08f;
 
+
     private TextMeshProUGUI text;
     private Coroutine running;
     private bool skipRequested;

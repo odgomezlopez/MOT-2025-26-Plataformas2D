@@ -13,7 +13,7 @@ public class DialogueManagerUI : ScreenController
     [SerializeField] private DialogueDesign leftDesign;
     [SerializeField] private DialogueDesign rightDesign;
 
-    private readonly Queue<DialogueSO.DialogueLine> sentences = new();
+    [SerializeField] private readonly Queue<DialogueSO.DialogueLine> sentences = new();
     private DialogueDesign activeDesign;
     private State state = State.Idle;
 
@@ -39,8 +39,9 @@ public class DialogueManagerUI : ScreenController
 
         leftDesign?.StopReveal();
         rightDesign?.StopReveal();
-        leftDesign?.Hide();
-        rightDesign?.Hide();
+        
+        leftDesign?.Hide(activeDesign == leftDesign);
+        rightDesign?.Hide(activeDesign == rightDesign);
 
         activeDesign = null;
         state = State.Idle;
@@ -166,7 +167,8 @@ public class DialogueManagerUI : ScreenController
             activeDesign.Hide();
         }
 
+        bool animated = activeDesign == null;
         activeDesign = target;
-        activeDesign.Show();
+        activeDesign.Show(animated);
     }
 }
