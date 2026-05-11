@@ -1,52 +1,84 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 
 public class DialogueManagerUI : ScreenController
 {
-    private enum State { Idle, Revealing, AwaitingNext }
+    #region Inspector Fields
+
+    [Header("Animation")]
+    [SerializeField] private bool animateOnFirstShow = true;
+    [SerializeField] private bool animateOnHide = true;
+    [SerializeField] private bool animateOnSpeakerChange = true;
 
     [Header("Input")]
     [SerializeField] private InputActionReference nextSentence;
+    [SerializeField] private AudioResource nextSentenceSFX;
 
-    [Header("Designs")]
-    [SerializeField] private DialogueDesign leftDesign;
-    [SerializeField] private DialogueDesign rightDesign;
+    [SerializeField] private DialogueDesignRegistry designs = new();
 
-    [SerializeField] private readonly Queue<DialogueSO.DialogueLine> sentences = new();
-    private DialogueDesign activeDesign;
-    private State state = State.Idle;
+    #endregion
+
+    #region State
+
+    private DialogueDesignManager activeDesign;
+    private bool isRevealing;
+    private readonly Queue<DialogueSO.DialogueLine> sentences = new();
+
+    #endregion
+
+    #region Unity Lifecycle
 
     protected override void Awake()
     {
         base.Awake();
-        newActionMap = "Dialogue";
+        newActionMap = "Dialogue"; //Todo: adapt to use GameManager states instead of action maps, or make it flexible to support both approaches.
+
+        designs.Build(this);
     }
+
+    #endregion
+
+    #region Screen Show / Hide
 
     public override void ShowScreen()
     {
         base.ShowScreen();
-        SubscribeInput();
-        SubscribeReveal(leftDesign);
-        SubscribeReveal(rightDesign);
+        nextSentence.action.performed += OnNextPressed;
     }
 
     public override void HideScreen()
     {
-        UnsubscribeInput();
-        UnsubscribeReveal(leftDesign);
-        UnsubscribeReveal(rightDesign);
+        nextSentence.action.performed -= OnNextPressed;
+        StartCoroutine(HideRoutine());
+    }
 
-        leftDesign?.StopReveal();
-        rightDesign?.StopReveal();
-        
-        leftDesign?.Hide(activeDesign == leftDesign);
-        rightDesign?.Hide(activeDesign == rightDesign);
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        nextSentence.action.performed -= OnNextPressed;
+    }
 
-        activeDesign = null;
-        state = State.Idle;
+    private IEnumerator HideRoutine()
+    {
+        var hiding = activeDesign;
+        SetActiveDesign(null);
+        isRevealing = false;
+
+        if (hiding != null)
+        {
+            hiding.DialogueText.Stop();
+            yield return hiding.Hide(animateOnHide);
+        }
+        DialogueManager.Instance.EndDialogue();
         base.HideScreen();
     }
+
+    #endregion
+
+    #region Dialogue Flow
 
     public void ShowDialogue(DialogueSO dialogue)
     {
@@ -58,63 +90,9 @@ public class DialogueManagerUI : ScreenController
         AdvanceToNextSentence();
     }
 
-    // --- Input ---------------------------------------------------------------
-
-    private void SubscribeInput()
-    {
-        if (nextSentence != null)
-            nextSentence.action.performed += OnNextPressed;
-    }
-
-    private void UnsubscribeInput()
-    {
-        if (nextSentence != null)
-            nextSentence.action.performed -= OnNextPressed;
-    }
-
-    private void OnNextPressed(InputAction.CallbackContext _)
-    {
-        if (activeDesign == null) return;
-
-        switch (state)
-        {
-            case State.Revealing:
-                activeDesign.DialogueText.SkipToEnd();
-                break;
-            case State.AwaitingNext:
-                AdvanceToNextSentence();
-                break;
-        }
-    }
-
-    // --- Reveal events -------------------------------------------------------
-
-    private void SubscribeReveal(DialogueDesign design)
-    {
-        if (design != null && design.DialogueText != null)
-            design.DialogueText.RevealCompleted += OnRevealCompleted;
-    }
-
-    private void UnsubscribeReveal(DialogueDesign design)
-    {
-        if (design != null && design.DialogueText != null)
-            design.DialogueText.RevealCompleted -= OnRevealCompleted;
-    }
-
-    private void OnRevealCompleted()
-    {
-        // Only react if the completed reveal was from the active design.
-        // (Both are subscribed; the inactive one shouldn't be revealing,
-        // but this guards against stray events.)
-        if (state != State.Revealing) return;
-        state = State.AwaitingNext;
-        activeDesign?.ShowAdvice();
-    }
-
-    // --- Flow ----------------------------------------------------------------
-
     private void AdvanceToNextSentence()
     {
+
         if (sentences.Count == 0)
         {
             HideScreen();
@@ -122,53 +100,82 @@ public class DialogueManagerUI : ScreenController
         }
 
         var line = sentences.Dequeue();
-        var character = line.SpeakerData;
-        var target = ResolveDesign(character);
+        var target = designs.Resolve(line.SpeakerData?.dialogueDesign);
 
         if (target == null)
         {
-            Debug.LogWarning($"[DialogueManagerUI] No design assigned for side '{character?.screenSide}'. Skipping line.");
+            Debug.LogError($"[{nameof(DialogueManagerUI)}] No design available to render this line.", this);
             AdvanceToNextSentence();
             return;
         }
 
-        SwitchActiveDesign(target);
-        target.ApplySpeaker(character);
+        StartCoroutine(SwitchAndPlay(target, line));
+    }
+
+    private IEnumerator SwitchAndPlay(DialogueDesignManager target, DialogueSO.DialogueLine line)
+    {
+        // Prepare the design's visuals before it appears so it never pops mid-animation.
+        target.ApplySpeaker(line.SpeakerData,line.Status);
         target.HideAdvice();
 
-        state = State.Revealing;
-        target.DialogueText.Play(line.Sentence.GetLocalizedString());
-    }
-
-    private DialogueDesign ResolveDesign(CharacterDataSO character)
-    {
-        if (character == null) return activeDesign;
-        return character.screenSide switch
+        if (activeDesign != target)
         {
-            CharacterDataSO.ScreenSide.Left => leftDesign,
-            CharacterDataSO.ScreenSide.Right => rightDesign,
-            _ => activeDesign
-        };
-    }
+            bool animate = activeDesign == null ? animateOnFirstShow : animateOnSpeakerChange;
 
-    private void SwitchActiveDesign(DialogueDesign target)
-    {
-        if (activeDesign == target)
-        {
-            // Same side speaking again — make sure it's shown (no-op if already).
-            target.Show();
-            return;
+            if (activeDesign != null)
+            {
+                activeDesign.HideAdvice();
+                yield return activeDesign.Hide(animate);
+            }
+
+            SetActiveDesign(target);
+            yield return activeDesign.Show(animate);
         }
 
-        // Hide the previous side, show the new one.
+        isRevealing = true;
+        activeDesign.DialogueText.Play(line.Sentence.GetLocalizedString());
+    }
+
+    /// <summary>
+    /// Swaps the active design and moves the RevealCompleted subscription with it.
+    /// Pass null to clear.
+    /// </summary>
+    private void SetActiveDesign(DialogueDesignManager next)
+    {
+        if (activeDesign == next) return;
+
         if (activeDesign != null)
-        {
-            activeDesign.HideAdvice();
-            activeDesign.Hide();
-        }
+            activeDesign.DialogueText.RevealCompleted -= OnRevealCompleted;
 
-        bool animated = activeDesign == null;
-        activeDesign = target;
-        activeDesign.Show(animated);
+        activeDesign = next;
+
+        if (activeDesign != null)
+            activeDesign.DialogueText.RevealCompleted += OnRevealCompleted;
     }
+
+    #endregion
+
+    #region Input & Reveal Callbacks
+
+    private void OnNextPressed(InputAction.CallbackContext _)
+    {
+        if (activeDesign == null) return;
+
+        if (isRevealing)
+            activeDesign.DialogueText.SkipToEnd();
+        else
+        {
+            AdvanceToNextSentence();
+            if(nextSentenceSFX) AudioManager.Instance.PlaySFX(nextSentenceSFX);
+        }
+    }
+
+    private void OnRevealCompleted()
+    {
+        if (!isRevealing) return;
+        isRevealing = false;
+        activeDesign?.ShowAdvice();
+    }
+
+    #endregion
 }

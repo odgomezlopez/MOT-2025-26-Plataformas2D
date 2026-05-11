@@ -24,6 +24,10 @@ public class Item : ScriptableObject
         Debug.Log($"Has usado el item: {itemName}");
     }
 
+    public void AddToInventory()
+    {
+        InventoryManager.Instance.AddItemToInventory(this, 1);
+    }
     public void RemoveOneFromInventory()
     {
         InventoryManager.Instance.RemoveItemFromInventory(this, 1);

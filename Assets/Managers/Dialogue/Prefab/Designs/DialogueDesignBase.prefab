@@ -600,7 +600,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -666,17 +666,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 9066628279403730132}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6cc3927605fb3a4eacef2e64105a5c4, type: 3}
+  m_Script: {fileID: 11500000, guid: df4b1133e12c4ab4285bda57deef17d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueDesign
-  animator: {fileID: 8667795223309209711}
+  animator: {fileID: 0}
   showDialogueTrigger: appear
   hideDialogueTrigger: disappear
-  showAdviceTrigger: showAdvice
-  hideAdviceTrigger: hideAdvice
+  fadeDuration: 0.2
+  canvas: {fileID: 0}
+  canvasGroup: {fileID: 0}
   dialogueText: {fileID: 3139771521442470417}
   backgroundImage: {fileID: 8577080455351538212}
   portrait: {fileID: 5211426086798058331}
+  adviceImage: {fileID: 7836219721729631780}
   nameLabel: {fileID: 8831101573236190762}
 --- !u!1 &9089922453291131690
 GameObject:
@@ -831,3 +833,8 @@ MonoBehaviour:
   charactersPerSecond: 40
   punctuationPause: 0.2
   commaPause: 0.08
+  typingClips:
+  - {fileID: 8300000, guid: 06153066f36be424891a8e676849f365, type: 3}
+  playEveryNCharacters: 2
+  skipNonLetters: 1
+  waitToStartSound: 0.2

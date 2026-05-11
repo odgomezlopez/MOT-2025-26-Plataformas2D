@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
+//TODO Adapt to use GameManager states instead of action maps, or make it flexible to support both approaches.
 public class ScreenController : MonoBehaviour
 {
     [Header("Action map")]
@@ -75,9 +76,13 @@ public class ScreenController : MonoBehaviour
         isVisible = true;
         canvas.enabled = true;
 
+        // Store the current action map before switching to the new one.
         oldActionMap = PlayerInput.currentActionMap?.name;
         if (!string.IsNullOrEmpty(newActionMap))
             PlayerInput.SwitchCurrentActionMap(newActionMap);
+        //Alternative. If GameManager manager the states
+        //GameManager.Instance?.SwitchState(GameState.UI);
+
 
         if (pauseGameWhenVisible) Time.timeScale = 0f;
         firstSelectObject?.Select();
@@ -93,6 +98,10 @@ public class ScreenController : MonoBehaviour
 
         if (!string.IsNullOrEmpty(oldActionMap))
             PlayerInput.SwitchCurrentActionMap(oldActionMap);
+
+        //Alternative. If GameManager manager the states
+        //GameManager.Instance?.ReturnToPreviousState();
+
 
         if (pauseGameWhenVisible) Time.timeScale = 1f;
     }
